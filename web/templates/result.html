@@ -2,33 +2,21 @@
 <html>
 	<head>
 		<title>OCR结果展示</title>
-		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='vis.min.css') }}">
-		<style type="text/css">
-		html,body{height:100%; width:100%; overflow:hidden; margin:0;padding:0;}
-		body{height:100%; width:100%; overflow:hidden; margin:0;padding:0;}
-		div{height:100%;}
-        #mynetwork {
-            border: 1px solid lightgray;
-        }
     </style>
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
-	<script type="text/javascript">
-		<!--$(document).ready(function() {-->
-	        <!--$.ajax({-->
-	            <!--url: '/relation.json?pid={{pid}}&&id={{id}}',-->
-	            <!--dataType: 'json',-->
-	            <!--success: function(data) {-->
-	            	<!--on_load(data);-->
-	            <!--},-->
-	            <!--error: function() {-->
-	             	<!--console.log(error);-->
-	            <!--}-->
-	        <!--});-->
-		<!--});-->
-	</script>
 	</head>
 	<body>
-        <img src="data:image/jpg;base64,{{ result['base64'] }}" >
+	  <h3>识别结果：</h3>
+	  <table>
+	  {% for text, small_img in zip(  result['text'] , result['small_images']  ):  %}
+		<tr>
+		  <td><img src="data:image/jpg;base64,{{small_img}}"></td>
+		  <td>{{text}}</td>
+		</tr>
+	  {% endfor %}
+	  </table>
+	  <h3>原图标识：</h3>
+	  <img src="data:image/jpg;base64,{{ result['image'] }}" width="80%">
 	</body>
 
 </html>
