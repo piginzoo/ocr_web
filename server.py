@@ -2,69 +2,20 @@
 from flask import Flask,jsonify,request,abort,render_template
 import base64,cv2,json,sys,numpy as np
 import sys,logging,os
-sys.path.insert(0,'/Users/piginzoo/workspace/opensource/ctpn')
-sys.path.insert(0,'/app.fast/projects/ctpn')
-sys.path.insert(0,'/Users/piginzoo/workspace/opensource/crnn')
-sys.path.insert(0,'/app.fast/projects/crnn')
+import conf
+# 为了集成项目
+for path in conf.CRNN_HOME + conf.CTPN_HOME:
+    sys.path.insert(0,path)
 import tensorflow as tf
 from threading import current_thread
 sys.path.append(".")
 import ocr_utils
-
-# 定义各类参数
-def init_arguments():
-
-    # gunicorn -w 2 -k gevent web.api_server:app -b 0.0.0.0:8080
-    tf.app.flags.DEFINE_string('worker-class', 'gevent', '')
-    tf.app.flags.DEFINE_integer('workers', 2, '')
-    tf.app.flags.DEFINE_string('bind', '0.0.0.0:8080', '')
-    tf.app.flags.DEFINE_integer('timeout', 60, '')
-
-    # ctpn的
-    tf.app.flags.DEFINE_boolean('debug_mode', True, '')
-    tf.app.flags.DEFINE_boolean('evaluate', False, '') # 是否进行评价（你可以光预测，也可以一边预测一边评价）
-    tf.app.flags.DEFINE_boolean('split', False, '')    # 是否对小框做出评价，和画到图像上
-    tf.app.flags.DEFINE_string('file', '', '')     # 为了支持单独文件，如果为空，就预测test_home中的所有文件
-    tf.app.flags.DEFINE_string('gpu', '0', '')
-    tf.app.flags.DEFINE_boolean('draw', True, '') # 是否把gt和预测画到图片上保存下来，保存目录也是pred_home
-    tf.app.flags.DEFINE_boolean('save', True, '') # 是否保存输出结果（大框、小框信息都要保存），保存到pred_home目录里面去
-    tf.app.flags.DEFINE_string('model', '../ctpn/model/', '') # model的存放目录，会自动加载最新的那个模型
-    tf.app.flags.DEFINE_string('test_home', 'data/test', '') # 被预测的图片目录
-    tf.app.flags.DEFINE_string('pred_home', 'data/pred', '') # 预测后的结果的输出目录
-
-    # crnn的
-    tf.app.flags.DEFINE_string('model_dir', "../crnn/model/", 'model dir')
-    tf.app.flags.DEFINE_boolean('debug', False, 'debug mode')
-    tf.app.flags.DEFINE_string('image_path', '', ' data dir')
-    tf.app.flags.DEFINE_string('weights_path', None, 'model path')
-
-
 # 完事了，才可以import ctpn，否则报错
 import main.pred  as ctpn
 import tools.pred as crnn
 
-logging.basicConfig(
-    format='%(asctime)s : %(levelname)s : %(message)s',
-    level=logging.DEBUG,
-    handlers=[logging.StreamHandler()])
-logger  = logging.getLogger("API Server")
-
 app = Flask(__name__, static_url_path='')
 app.jinja_env.globals.update(zip=zip)
-
-logger.debug('子进程:%s,父进程:%s,线程:%r', os.getpid(), os.getppid(),current_thread())
-
-
-logger.debug("初始化TF各类参数")
-init_arguments()
-
-logger.debug("开始初始化CTPN")
-sess_ctpn = ctpn.initialize()
-
-logger.debug("开始初始化CRNN")
-
-sess_crnn, charset, decodes, prob, inputdata = crnn.initialize()
-
 
 #读入的buffer是个纯byte数据
 def process(buffer,image_name):
@@ -173,7 +124,19 @@ def test():
 
 if __name__ == "__main__":
     # 生产代码
-    app.run(host='0.0.0.0', port=8080)
+    app.run()
+    logging.basicConfig(
+        format='%(asctime)s : %(levelname)s : %(message)s',
+        level=logging.DEBUG,
+        handlers=[logging.StreamHandler()])
+    logger = logging.getLogger("API Server")
+    logger.debug('子进程:%s,父进程:%s,线程:%r', os.getpid(), os.getppid(), current_thread())
+    logger.debug("初始化TF各类参数")
+    conf.init_arguments()
+    logger.debug("开始初始化CTPN")
+    sess_ctpn = ctpn.initialize()
+    logger.debug("开始初始化CRNN")
+    sess_crnn, charset = crnn.initialize()
 
     # # 测试代码
     # with open("test/test.png","rb") as f:

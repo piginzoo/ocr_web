@@ -1,1 +1,1 @@
-gunicorn --workers=2 --worker-class=gevent web.api_server:app --bind=0.0.0.0:8080 --timeout=300
+gunicorn --workers=2 --worker-class=gevent server:app --bind=0.0.0.0:8081 --timeout=300
