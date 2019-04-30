@@ -21,7 +21,7 @@ CTPN_TEST_DIR = "data/test" #
 
 # CRNN常用参数
 CRNN_HOME=['/Users/piginzoo/workspace/opensource/crnn','/app.fast/projects/crnn']
-CRNN_MODEL_FILE= "crnn_2019-04-30-17-17-21.ckpt"
+CRNN_MODEL_FILE= "crnn_2019-04-30-17-17-21.ckpt-0"
 CRNN_MODEL_DIR="../crnn/model"
 CRNN_CHARSET_FILE="../crnn/charset6k.txt"
 CRNN_BATCH_SIZE=32
