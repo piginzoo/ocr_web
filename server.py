@@ -52,7 +52,7 @@ def process(buffer,image_name):
     # logger.debug("预测返回结果：%r",result[0])
     small_images = ocr_utils.crop_small_images(image,result[0]['boxes'])
     # small_images = small_images[:2]  # 测试用，为了提高测试速度，只处理2个
-    all_txt = crnn.pred(small_images,sess_crnn)
+    all_txt = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,sess_crnn)
 
     # 小框们的文本们
     result[0]['text'] = all_txt

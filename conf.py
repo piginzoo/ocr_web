@@ -24,6 +24,7 @@ CRNN_HOME=['/Users/piginzoo/workspace/opensource/crnn','/app.fast/projects/crnn'
 CRNN_MODEL_FILE= "crnn_2019-04-30-17-17-21.ckpt"
 CRNN_MODEL_DIR="../crnn/model"
 CRNN_CHARSET_FILE="../crnn/charset6k.txt"
+CRNN_BATCH_SIZE=32
 
 # 通用的调试开关
 DEBUG=True
@@ -56,4 +57,5 @@ def init_arguments():
     # crnn的
     tf.app.flags.DEFINE_string('crnn_model_dir', CRNN_MODEL_DIR, '')
     tf.app.flags.DEFINE_string('crnn_model_file',CRNN_MODEL_FILE, '')
+    tf.app.flags.DEFINE_integer('batch_size', CRNN_BATCH_SIZE, '')
     tf.app.flags.DEFINE_string('charset', CRNN_CHARSET_FILE, '')    # 字符集
