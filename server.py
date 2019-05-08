@@ -27,14 +27,11 @@ def process(buffer,image_name):
 
     if len(buffer)==0: return False,"Image is null"
 
-    #先给他转成ndarray(numpy的)
+    # 先给他转成ndarray(numpy的)
     data_array = np.frombuffer(buffer,dtype=np.uint8)
 
-    #从ndarray中读取图片，有raw数据变成一个图片GBR数据
-    #出来的数据，其实就是有维度了，就是原图的尺寸，如160x70
-    image = cv2.imdecode(data_array, cv2.IMREAD_COLOR)[:,:,::-1]
-    # cv2.imwrite("test1.png",image) BGR
-    # cv2.imwrite("test2.png",image[:,:,::-1]) RGB
+    # 从ndarray中读取图片，有raw数据变成一个图片GBR数据,出来的数据，其实就是有维度了，就是原图的尺寸，如160x70
+    image = cv2.imdecode(data_array, cv2.IMREAD_COLOR)
 
     if image is None:
         logger.error("图像解析失败")#有可能从字节数组解析成图片失败
