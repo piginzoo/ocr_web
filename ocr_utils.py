@@ -5,13 +5,14 @@ import base64
 logger = logging.getLogger("OCR Utils")
 
 # 输入是[[x1,y1,x2,y2,x3,y3,x4,y4],]
+#         |    |  ^     ^
 def crop_small_images(img,polygens):
     logger.debug("图像：%r" , img.shape)
     cropped_images = []
     for pts in polygens:
         # crop_img = img[y:y+h, x:x+w]
         logger.debug("子图坐标：%r",pts)
-        crop_img = img[pts[3]:pts[5], pts[0]:pts[2]]
+        crop_img = img[int(pts[3]):int(pts[5]), int(pts[0]):int(pts[2])]
         cropped_images.append(crop_img)
     return cropped_images
 
