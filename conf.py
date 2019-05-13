@@ -8,8 +8,7 @@
 CTPN_HOME=['/Users/piginzoo/workspace/opensource/ctpn','/app.fast/projects/ctpn']
 
 # CTPN常用参数
-CTPN_MODEL_FILE= "ctpn_50000.ckpt" # 定义模型目录，如果FILE被定义，直接加载FILE，否则，挑选最新的模型加载(即在checkpoint文件中记录的）
-CTPN_MODEL_FILE= "ctpn-2019-04-24-17-50-18-15000.ckpt"
+CTPN_MODEL_FILE= "model/ctpn-2019-05-11-23-08-31-8001.ckpt" # 定义模型目录，如果FILE被定义，直接加载FILE，否则，挑选最新的模型加载(即在checkpoint文件中记录的）
 
 CTPN_MODEL_DIR= "../ctpn/model"
 CTPN_DRAW = True
@@ -21,7 +20,7 @@ CTPN_TEST_DIR = "data/test" #
 
 # CRNN常用参数
 CRNN_HOME=['/Users/piginzoo/workspace/opensource/crnn','/app.fast/projects/crnn']
-CRNN_MODEL_FILE= "crnn_2019-05-08-14-48-44.ckpt-179000"
+CRNN_MODEL_FILE= "crnn_2019-05-10-08-44-44.ckpt-199000"
 CRNN_MODEL_DIR="../crnn/model"
 CRNN_CHARSET_FILE="../crnn/charset6k.txt"
 CRNN_BATCH_SIZE=32
