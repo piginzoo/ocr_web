@@ -8,7 +8,7 @@
 CTPN_HOME=['/Users/piginzoo/workspace/opensource/ctpn','/app.fast/projects/ctpn']
 
 # CTPN常用参数
-CTPN_MODEL_FILE= "model/ctpn-2019-05-11-23-08-31-8001.ckpt" # 定义模型目录，如果FILE被定义，直接加载FILE，否则，挑选最新的模型加载(即在checkpoint文件中记录的）
+CTPN_MODEL_FILE= "ctpn-2019-05-11-23-08-31-8001.ckpt" # 定义模型目录，如果FILE被定义，直接加载FILE，否则，挑选最新的模型加载(即在checkpoint文件中记录的）
 
 CTPN_MODEL_DIR= "../ctpn/model"
 CTPN_DRAW = True
