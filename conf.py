@@ -14,7 +14,7 @@ CTPN_MODEL_DIR= "../ctpn/model"
 CTPN_DRAW = True
 CTPN_SAVE = True        # 是否保存识别的坐标
 CTPN_EVALUATE = True    # 是否提供评估
-CTPN_SPLIT = False      # 是否保留小框(CTPN网络识别结果）
+CTPN_SPLIT = True      # 是否保留小框(CTPN网络识别结果）
 CTPN_PRED_DIR = "data/pred" # 保存的内容存放的目录
 CTPN_TEST_DIR = "data/test" #
 
