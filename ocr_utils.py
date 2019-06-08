@@ -17,7 +17,7 @@ def crop_small_images(img,polygens):
     return cropped_images
 
 
-def tobase64(data):
+def nparray2base64(data):
 
     if type(data)==list:
         result = []

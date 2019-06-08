@@ -15,17 +15,21 @@ import main.pred  as ctpn
 import tools.pred as crnn
 
 import os
+import api
+
+
+DEBUG = False
+
 cwd = os.getcwd()
 app = Flask(__name__,root_path="web")
 app.jinja_env.globals.update(zip=zip)
 
 logger = logging.getLogger("WebServer")
 
-#读入的buffer是个纯byte数据
-def process(buffer,image_name):
+def decode2img(buffer):
     logger.debug("从web读取数据len:%r",len(buffer))
 
-    if len(buffer)==0: return False,"Image is null"
+    if len(buffer)==0: return False,"图片是空"
 
     # 先给他转成ndarray(numpy的)
     data_array = np.frombuffer(buffer,dtype=np.uint8)
@@ -35,32 +39,46 @@ def process(buffer,image_name):
 
     if image is None:
         logger.error("图像解析失败")#有可能从字节数组解析成图片失败
-        return False,None
+        return None
 
     logger.debug("从字节数组变成图像的shape:%r",image.shape)
 
+    return image
+
+#读入的buffer是个纯byte数据
+def process(image,image_name="test.jpg",is_verbose=False):
+
+    # result:[{
+    #     name: 'xxx.png',
+    #     'box': {
+    #         [1, 1, 1, 1],
+    #         [2, 2, 2, 2]
+    #     },
+    #     image : <draw image numpy array>,
+    #     'f1': 0.78
+    #     }
+    # }, ]
     result = ctpn.pred(sess_ctpn,[image],[image_name])
-
-    for r in result:
-        # 从opencv的np array格式，转成原始图像，再转成base64
-        r['image'] = ocr_utils.tobase64(r['image'])
-
 
     # logger.debug("预测返回结果：%r",result[0])
     small_images = ocr_utils.crop_small_images(image,result[0]['boxes'])
-    # small_images = small_images[:2]  # 测试用，为了提高测试速度，只处理2个
-    # all_txt = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,sess_crnn)
-    # 仅仅调试CTPN
-    all_txt = ['']*len(small_images)
-
-    # 小框们的文本们
-    result[0]['text'] = all_txt
-
-    # 小框们的图片的base64
-    result[0]['small_images'] = ocr_utils.tobase64(small_images)
-
+    all_txt = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,sess_crnn)
     logger.debug("最终的预测结果为：%r",all_txt)
-    # logger.debug("最终的预测的子图:%r",result[0]['small_images'])
+    result[0]['text'] = all_txt    # 小框们的文本们
+
+    # 仅仅调试CTPN
+    # all_txt = ['']*len(small_images)
+
+    # 返回原图和切出来的小图，这个是为了调试用
+    if is_verbose:
+        # 小框们的图片的base64
+        result[0]['small_images'] = ocr_utils.tobase64(small_images)
+        # 这个是为了，把图片再回显到网页上用
+        for r in result:
+            # 从opencv的np array格式，转成原始图像，再转成base64
+            if r.get('image',None):
+                r['image'] = ocr_utils.nparray2base64(r['image'])
+        # logger.debug("最终的预测的子图:%r",result[0]['small_images'])
 
     return True,result[0]
 
@@ -73,36 +91,51 @@ def index():
 
 
 # base64编码的图片识别
-@app.route('/ocr.64',methods=['POST'])
+@app.route('/ocr',methods=['POST'])
 def ocr_base64():
 
-    base64_data = request.form.get('image','')
+    logger.debug("post calling...")
 
-    # 去掉可能传过来的“data:image/jpeg;base64,”HTML tag头部信息
-    index = base64_data.find(",")
-    if index!=-1: base64_data = base64_data[index+1:]
-
-    buffer = base64.b64decode(base64_data)
-    
     try:
-        success,result = process(buffer)
+        conf.disable_debug_flags() # 不用处理调试的动作，但是对post方式，还是保留
+        buffer = api.process_request(request)
+
+        image = decode2img(buffer)
+        height,width,_ = image.shape
+        if image is None:
+            return jsonify({'error_code':-1,'message':'image decode from base64 failed.'})
+
+        if DEBUG:
+            success=True
+            result= { # 测试用
+                'name': 'xxx.png',
+                'boxes': [[1, 1, 1, 1],
+                        [2, 2, 2, 2]],
+                'text':['xxxxxxx','yyyyyyy']
+            }
+        else:
+            success,result = process(image)
+        # width,height,_ = buffer.shape()
+
+        if result:
+            result = api.post_process(result,width,height)
     except Exception as e:
         import traceback
         traceback.print_exc()
         logger.error("处理图片过程中出现问题：%r",e)
-        return jsonify({'success':'false','reason':str(e)}) 
+        return jsonify({'error_code':-1,'message':str(e)})
     
     if success: 
         if result is None:
-            return jsonify({'success':'false','reason':'image resolve fail'}) 
+            return jsonify({'error_code':-1,'message':'image resolve fail'})
         else:
-            return jsonify({'success':'true','result':result})
+            return jsonify(result)
     else:
-        return jsonify({'success':'false','result':result}) 
+        return jsonify({'error_code':-1,'message':result})
 
 
 # 图片的识别
-@app.route('/ocr',methods=['POST'])
+@app.route('/ocr.post',methods=['POST'])
 def ocr():
     data = request.files['image']
     image_name = data.filename
@@ -132,9 +165,12 @@ def startup():
     logger.debug("初始化TF各类参数")
     logger.debug('web目录:%s', app.root_path)
 
+
+
     conf.init_arguments()
     logger.debug("开始初始化CTPN")
 
+    if DEBUG: return
     global sess_ctpn,sess_crnn
     sess_ctpn = ctpn.initialize()
     logger.debug("开始初始化CRNN")
@@ -147,3 +183,4 @@ def startup():
 
 
 startup()
+
