@@ -5,7 +5,7 @@ import sys,logging,os
 import conf
 # 为了集成项目
 for path in conf.CRNN_HOME + conf.CTPN_HOME:
-    sys.path.insert(0,path)
+    sys.path.insert(0, os.path.join(os.path.abspath(os.pardir), path))
 import tensorflow as tf
 from threading import current_thread
 sys.path.append(".")

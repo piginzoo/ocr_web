@@ -7,7 +7,7 @@ import tensorflow as tf
 ################################################################
 
 # 定义相关的目录，这个是为了方便3个项目集成，所以需要绝对路径，方便import，不是为了找文件，找文件用相对路径就好，是为了python import
-CTPN_HOME=['../ctpn']
+CTPN_HOME=['ctpn']
 
 # CTPN常用参数
 CTPN_MODEL_FILE= "ctpn-2019-05-28-22-32-39-2901.ckpt" # 定义模型目录，如果FILE被定义，直接加载FILE，否则，挑选最新的模型加载(即在checkpoint文件中记录的）
@@ -21,7 +21,7 @@ CTPN_PRED_DIR = "data/pred" # 保存的内容存放的目录
 CTPN_TEST_DIR = "data/test" #
 
 # CRNN常用参数
-CRNN_HOME=['../crnn']
+CRNN_HOME=['crnn']
 CRNN_MODEL_FILE= "crnn_2019-06-08-07-56-35.ckpt-128000"
 CRNN_MODEL_DIR="../crnn/model"
 CRNN_CHARSET_FILE="../crnn/charset6k.txt"
