@@ -8,32 +8,12 @@
 		<div align="left" style="color:red">
 			@程序版本：{{ version }}
 		</div>
-		<!--
-		<hr>
-		<h2>图片OCR识别 Base64方式</h2>
-		<form action="/ocr.64" method="POST">
-			<table>
-				<tr>
-					<td>识别图片</td>
-					<td><input type="file" id="upload_file" multiple="multiple" />
-					</td>
-				</tr>
-				<tr>
-					<td>图片Base64编码</td>
-					<td>
-						<textarea id="base64_output" name="image" style=" width:820px"></textarea>
-					</td>
-				</tr>								
-				<tr>
-					<td></td>
-					<td><input type="submit" value="识别"/></td>
-				</tr>
-			</table>
-		</form>
-		-->
+
+		如果需要测试base64方式，请运行test/test.sh。
+
 		<hr>
 		<h2>图片OCR识别  文件方式</h2>
-		<form action="/ocr" enctype="multipart/form-data"  method="POST">
+		<form action="/ocr.post" enctype="multipart/form-data"  method="POST">
 			<table>
 				<tr>
 					<td>识别图片</td>

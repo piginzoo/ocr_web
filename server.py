@@ -3,7 +3,7 @@ from flask import Flask,jsonify,request,abort,render_template
 import base64,cv2,json,sys,numpy as np
 import sys,logging,os
 import conf
-# 为了集成项目
+# 为了集成项目,把CTPN和CRNN项目的绝对路径加到python类路径里面
 for path in conf.CRNN_HOME + conf.CTPN_HOME:
     sys.path.insert(0, os.path.join(os.path.abspath(os.pardir), path))
 import tensorflow as tf
@@ -72,11 +72,11 @@ def process(image,image_name="test.jpg",is_verbose=False):
     # 返回原图和切出来的小图，这个是为了调试用
     if is_verbose:
         # 小框们的图片的base64
-        result[0]['small_images'] = ocr_utils.tobase64(small_images)
+        result[0]['small_images'] = ocr_utils.nparray2base64(small_images)
         # 这个是为了，把图片再回显到网页上用
         for r in result:
             # 从opencv的np array格式，转成原始图像，再转成base64
-            if r.get('image',None):
+            if r.get('image',None) is not None:
                 r['image'] = ocr_utils.nparray2base64(r['image'])
         # logger.debug("最终的预测的子图:%r",result[0]['small_images'])
 
@@ -140,8 +140,9 @@ def ocr():
     data = request.files['image']
     image_name = data.filename
     buffer = data.read()
-    logger.debug("获得上传图片[%s]，尺寸：%d 字节", image_name,len(buffer))
-    success,result = process(buffer,image_name)
+    image = decode2img(buffer)
+    logger.debug("获得上传图片[%s]，尺寸：%d 字节", image_name,len(image))
+    success,result = process(image,image_name,is_verbose=True)
     return render_template('result.html', result=result)
 
 
