@@ -9,7 +9,7 @@
 echo "Test OCR ..."
 port=8080
 
-if [ "$1"=="error" ];
+if [ "$1" == "error" ];
 then
     echo "异常case测试..."
     #我靠，搞了半天，终于搞定了，必须用管道格式，否则，报错

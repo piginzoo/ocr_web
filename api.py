@@ -83,7 +83,7 @@ def post_process(result,width,height):
     text = ""
     for i,b in enumerate(result['boxes']):
         one = {}
-        one['pos'] = b.tolist()
+        one['pos'] = covert2xy(b.tolist())
         one['word'] = result['text'][i]
         prism_wordsInfo.append(one)
 
@@ -101,3 +101,19 @@ def post_process(result,width,height):
         "orgWidth": width,
         "content": text
     }
+
+def covert2xy(xy_list):
+    return \
+        [{
+            "x":xy_list[0],
+            "y": xy_list[1],
+        },{
+            "x":xy_list[2],
+            "y": xy_list[3],
+        },{
+            "x":xy_list[4],
+            "y": xy_list[5],
+        },{
+            "x":xy_list[6],
+            "y": xy_list[7],
+        }]
