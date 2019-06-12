@@ -19,6 +19,12 @@ if [ "$1" = "stop" ]; then
     exit
 fi
 
+if [ ! "$1" = "start" ]; then
+    help
+    exit
+fi
+
+
 # 默认
 PORT=8080
 WORKER=9
@@ -54,9 +60,9 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-echo "服务器即将启动, 端口:$PORT 工作进程:$WORKER"
+echo "服务器启动... 端口:$PORT 工作进程:$WORKER"
 
-CUDA_VISIBLE_DEVICES=0 gunicorn \
+nohup gunicorn \
     --workers=$WORKER \
     --worker-class=gevent \
     --bind=0.0.0.0:$PORT \

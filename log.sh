@@ -1,1 +1,1 @@
-tail -f logs/`ls logs -rot|awk '{print $8}'|tail -n 1`
+tail -f logs/`ls -lhort logs|awk '{print $8}'|tail -n 1`

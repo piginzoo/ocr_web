@@ -5,12 +5,21 @@
 	</head>	
 	<body>
 		<h1>图像识别OCR</h1>
-		<div align="left" style="color:red">
-			@程序版本：{{ version }}
-		</div>
 
 		如果需要测试base64方式，请运行test/test.sh。
-
+		<pre>
+调用URL：http://101.200.57.40:8080/
+调用方式：Post,Content-type: application/json
+调用数据：
+{
+	"img":"/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgH....AH/9k=",
+	"url":"",
+	"prob":false,
+	"charInfo":false,
+	"rotate":false,
+	"table":false
+}
+		</pre>
 		<hr>
 		<h2>图片OCR识别  文件方式</h2>
 		<form action="/ocr.post" enctype="multipart/form-data"  method="POST">
