@@ -2,11 +2,11 @@ Date=$(date +%Y%m%d%H%M)
 
 if [ "$1" = "stop" ]; then
     echo "停止 OCR Web 服务"
-    ps aux|grep gunicorn|grep -v gunicorn|awk '{print $2}'|xargs kill -9
+    ps aux|grep gunicorn|grep -v grep|awk '{print $2}'|xargs kill -9
     exit
 fi
 
-WORKER_NUM=4
+WORKER_NUM=9 #2*(CPU-cores)+1
 
 if [ ! -z "$1" ]; then
     WORKER_NUM=$1

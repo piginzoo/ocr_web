@@ -22,7 +22,7 @@ CTPN_TEST_DIR = "data/test" #
 
 # CRNN常用参数
 CRNN_HOME=['crnn']
-CRNN_MODEL_FILE= "crnn_2019-06-08-07-56-35.ckpt-128000"
+CRNN_MODEL_FILE= "crnn_2019-06-12-11-07-43.ckpt-100000"
 CRNN_MODEL_DIR="../crnn/model"
 CRNN_CHARSET_FILE="../crnn/charset6k.txt"
 CRNN_BATCH_SIZE=32
