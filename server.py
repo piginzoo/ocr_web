@@ -4,7 +4,7 @@ import base64,cv2,json,sys,numpy as np
 import sys,logging,os
 import conf
 # 为了集成项目,把CTPN和CRNN项目的绝对路径加到python类路径里面
-for path in conf.CRNN_HOME + conf.CTPN_HOME:
+for path in conf.CTPN_HOME + conf.CRNN_HOME:
     sys.path.insert(0, os.path.join(os.path.abspath(os.pardir), path))
 import tensorflow as tf
 from threading import current_thread
