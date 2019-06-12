@@ -21,7 +21,10 @@ def process_request(request):
     logger.debug("Got data:%d bytes",len(str_data))
     # import requests
     # requests.get(url).json()
-    data = json.loads(str_data)
+    data = str_data.decode('utf-8')
+    data = data.replace('\r\n', '')
+    data = data.replace('\n', '')
+    data = json.loads(data)
 
     base64_data = data['img']
     logger.debug("Got image ,size:%d",len(base64_data))
