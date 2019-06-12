@@ -8,6 +8,24 @@
 #}
 echo "Test OCR ..."
 port=8080
+
+if [ "$1"=="error" ];
+then
+    echo "异常case测试..."
+    #我靠，搞了半天，终于搞定了，必须用管道格式，否则，报错
+    curl -v -d @- -H "Content-type: application/json" http://localhost:$port/ocr <<CURL_DATA
+{
+    "img": "GHJKFGHJKFGHJKGHJKGHJK",
+	"prob":false,
+	"charInfo":false,
+	"rotate":false,
+	"table":false;
+}
+CURL_DATA
+    exit -1
+
+fi
+
 if [ ! -z $@ ]
 then
   echo "set port to $1"
@@ -30,4 +48,6 @@ curl -v -d @- -H "Content-type: application/json" http://localhost:$port/ocr <<C
 	"table":false
 }
 CURL_DATA
+
+
 

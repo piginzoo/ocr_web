@@ -1,6 +1,6 @@
 import json,base64
 import logging
-
+from json.decoder import JSONDecodeError
 logger = logging.getLogger("API")
 '''
 请求的报文：
@@ -21,10 +21,17 @@ def process_request(request):
     logger.debug("Got data:%d bytes",len(str_data))
     # import requests
     # requests.get(url).json()
+
     data = str_data.decode('utf-8')
-    data = data.replace('\r\n', '')
-    data = data.replace('\n', '')
-    data = json.loads(data)
+
+    try:
+        data = data.replace('\r\n', '')
+        data = data.replace('\n', '')
+        data = json.loads(data)
+    except JSONDecodeError as e:
+        logger.error(data)
+        logger.error("JSon数据格式错误")
+        raise  Exception("JSon数据格式错误:"+str(e))
 
     base64_data = data['img']
     logger.debug("Got image ,size:%d",len(base64_data))
@@ -32,7 +39,7 @@ def process_request(request):
 
     index = base64_data.find(",")
     if index!=-1: base64_data = base64_data[index+1:]
-    print(base64_data)
+    # print(base64_data)
     # 降base64转化成byte数组
     buffer = base64.b64decode(base64_data)
     logger.debug("Convert image to bytes by base64, lenght:%d",len(buffer))
