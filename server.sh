@@ -7,9 +7,14 @@ function help(){
     exit
 }
 
-
 if [ -z "$*" ]; then
     help
+    exit
+fi
+
+if [ "$1" = "debug" ]; then
+    echo "OCR Web 服务调试模式"
+    gunicorn --workers=1 --bind=0.0.0.0:8080 --timeout=300 server:app
     exit
 fi
 
@@ -24,12 +29,11 @@ if [ ! "$1" = "start" ]; then
     exit
 fi
 
-
 # 默认
 PORT=8080
 WORKER=9
 
-ARGS=`getopt -o p:w: --long port:,worker: -n 'example.bash' -- "$@"`
+ARGS=`getopt -o p:w: --long port:,worker: -n 'help.bash' -- "$@"`
 if [ $? != 0 ]; then
     help
     exit 1

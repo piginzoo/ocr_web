@@ -4,9 +4,23 @@
 		<title>图像识别OCR</title>
 	</head>	
 	<body>
-		<h1>图像识别OCR</h1>
-
-		如果需要测试base64方式，请运行test/test.sh。
+		<h1>图像识别</h1>
+		<h2>图片OCR识别Post文件方式</h2>
+		<form action="/ocr.post" enctype="multipart/form-data"  method="POST">
+			<table>
+				<tr>
+					<td>识别图片</td>
+					<td><input type="file" name="image" multiple="multiple" />
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><input type="submit" value="识别"/></td>
+				</tr>
+			</table>
+		</form>
+		<h2>图片OCR识别JSON API方式</h2>
+		如果需要测试base64方式，请运行test/<a href="test.sh">test.sh</a>。
 		<pre>
 调用URL：http://101.200.57.40:8080/
 调用方式：Post,Content-type: application/json
@@ -21,20 +35,7 @@
 }
 		</pre>
 		<hr>
-		<h2>图片OCR识别  文件方式</h2>
-		<form action="/ocr.post" enctype="multipart/form-data"  method="POST">
-			<table>
-				<tr>
-					<td>识别图片</td>
-					<td><input type="file" name="image" multiple="multiple" />
-					</td>
-				</tr>
-				<tr>
-					<td></td>
-					<td><input type="submit" value="识别"/></td>
-				</tr>
-			</table>
-		</form>
+
 	</body>
 	<!-- <script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"> -->
 	<script type="text/javascript">
