@@ -9,7 +9,7 @@ for path in conf.CRNN_HOME+conf.CTPN_HOME:
 import tensorflow as tf
 from threading import current_thread
 sys.path.append(".")
-import ocr_utils
+import ocr_utils,time
 # 完事了，才可以import ctpn，否则报错
 import main.pred  as ctpn
 import tools.pred as crnn
@@ -61,7 +61,7 @@ def process(image,image_name="test.jpg",is_verbose=False):
 
     # logger.debug("预测返回结果：%r",result[0])
     small_images = ocr_utils.crop_small_images(image,result[0]['boxes'])
-    all_txt = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,sess_crnn)
+    all_txt,_ = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,sess_crnn)
     logger.debug("最终的预测结果为：%r",all_txt)
     result[0]['text'] = all_txt    # 小框们的文本们
 
@@ -141,7 +141,9 @@ def ocr():
     buffer = data.read()
     image = decode2img(buffer)
     logger.debug("获得上传图片[%s]，尺寸：%d 字节", image_name,len(image))
+    start = time.time()
     success,result = process(image,image_name,is_verbose=True)
+    logger.debug("识别图片[%s]花费[%d]秒",image_name,time.time()-start)
     return render_template('result.html', result=result)
 
 
@@ -164,8 +166,6 @@ def startup():
     logger.debug('子进程:%s,父进程:%s,线程:%r', os.getpid(), os.getppid(), current_thread())
     logger.debug("初始化TF各类参数")
     logger.debug('web目录:%s', app.root_path)
-
-
 
     conf.init_arguments()
     logger.debug("开始初始化CTPN")

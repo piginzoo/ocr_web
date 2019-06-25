@@ -22,10 +22,11 @@ CTPN_TEST_DIR = "data/test" #
 
 # CRNN常用参数
 CRNN_HOME=['crnn']
-CRNN_MODEL_FILE= "crnn_2019-06-12-11-07-43.ckpt-100000"
+#CRNN_MODEL_FILE= "crnn_2019-06-17-11-03-21.ckpt-325000"
+CRNN_MODEL_FILE= "LATEST"
 CRNN_MODEL_DIR="../crnn/model"
-CRNN_CHARSET_FILE="../crnn/charset.6883.txt"
-CRNN_BATCH_SIZE=32
+CRNN_CHARSET_FILE="../crnn/charset.3770.txt"
+CRNN_BATCH_SIZE=128
 
 # 通用的调试开关
 DEBUG=True
@@ -69,3 +70,4 @@ def init_arguments():
     tf.app.flags.DEFINE_string('crnn_model_file',CRNN_MODEL_FILE, '')
     tf.app.flags.DEFINE_integer('batch_size', CRNN_BATCH_SIZE, '')
     tf.app.flags.DEFINE_string('charset', CRNN_CHARSET_FILE, '')    # 字符集
+    tf.app.flags.DEFINE_string('resize_mode', 'PAD', '')
