@@ -1,5 +1,5 @@
 #-*- coding:utf-8 -*- 
-from flask import Flask,jsonify,request,abort,render_template
+from flask import Flask,jsonify,request,abort,render_template,Response
 import base64,cv2,json,sys,numpy as np
 import sys,logging,os
 import conf
@@ -57,7 +57,7 @@ def process(image,image_name="test.jpg",is_verbose=False):
     #     'f1': 0.78
     #     }
     # }, ]
-    result = ctpn.pred(sess_ctpn,[image],[image_name])
+    result = ctpn.pred(sess,[image],[image_name])
 
     # logger.debug("预测返回结果：%r",result[0])
     small_images = ocr_utils.crop_small_images(image,result[0]['boxes'])
@@ -140,6 +140,10 @@ def ocr():
     image_name = data.filename
     buffer = data.read()
     image = decode2img(buffer)
+    if image is None:
+        abort(500)
+        abort(Response('解析Web传入的图片失败'))
+
     logger.debug("获得上传图片[%s]，尺寸：%d 字节", image_name,len(image))
     start = time.time()
     success,result = process(image,image_name,is_verbose=True)
@@ -161,20 +165,26 @@ def test():
 def startup():
     logging.basicConfig(
         format='%(asctime)s : %(levelname)s : %(message)s',
-        level=logging.DEBUG,
+        level=logging.INFO,
         handlers=[logging.StreamHandler()])
     logger.debug('子进程:%s,父进程:%s,线程:%r', os.getpid(), os.getppid(), current_thread())
     logger.debug("初始化TF各类参数")
     logger.debug('web目录:%s', app.root_path)
 
     conf.init_arguments()
-    logger.debug("开始初始化CTPN")
 
-    if DEBUG: return
-    global sess_ctpn,sess_crnn
-    sess_ctpn = ctpn.initialize()
+    global sess
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.333)
+    config = tf.ConfigProto(gpu_options=gpu_options)
+    config.gpu_options.allow_growth = True
+    config.allow_soft_placement = True
+    sess = tf.Session(config=config)
+
+    logger.debug("开始初始化CTPN")
+    ctpn.initialize(sess)
+
     logger.debug("开始初始化CRNN")
-    sess_crnn = crnn.initialize()
+    crnn.initialize(sess)
 
     # # 测试代码
     # with open("test/test.png","rb") as f:
