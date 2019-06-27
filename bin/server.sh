@@ -56,7 +56,7 @@ do
                     shift 2
                     ;;
                 -g|--gpu)
-                    echo "自定义#GPU：$2"
+                    echo "自定义#GPU：  #$2"
                     GPU=$2
                     shift 2
                     ;;

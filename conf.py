@@ -12,7 +12,7 @@ CTPN_HOME=['ctpn']
 # CTPN常用参数
 CTPN_MODEL_FILE= "ctpn-2019-05-28-22-32-39-2901.ckpt" # 定义模型目录，如果FILE被定义，直接加载FILE，否则，挑选最新的模型加载(即在checkpoint文件中记录的）
 
-CTPN_MODEL_DIR= "../ctpn/model"
+CTPN_MODEL_DIR= "../models"
 CTPN_DRAW = True
 CTPN_SAVE = False        # 是否保存识别的坐标
 CTPN_EVALUATE = False    # 是否提供评估
@@ -24,7 +24,7 @@ CTPN_TEST_DIR = "data/test" #
 CRNN_HOME=['crnn']
 #CRNN_MODEL_FILE= "crnn_2019-06-17-11-03-21.ckpt-325000"
 CRNN_MODEL_FILE= "LATEST"
-CRNN_MODEL_DIR="../crnn/model"
+CRNN_MODEL_DIR="../models"
 CRNN_CHARSET_FILE="../crnn/charset.3770.txt"
 CRNN_BATCH_SIZE=128
 
