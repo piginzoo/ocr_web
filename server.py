@@ -57,11 +57,12 @@ def process(image,image_name="test.jpg",is_verbose=False):
     #     'f1': 0.78
     #     }
     # }, ]
-    result = ctpn.pred(sess,[image],[image_name])
+    global  crnn_sess,ctpn_sess
+    result = ctpn.pred(ctpn_sess,[image],[image_name])
 
     # logger.debug("预测返回结果：%r",result[0])
     small_images = ocr_utils.crop_small_images(image,result[0]['boxes'])
-    all_txt,_ = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,sess_crnn)
+    all_txt,_ = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,crnn_sess)
     logger.debug("最终的预测结果为：%r",all_txt)
     result[0]['text'] = all_txt    # 小框们的文本们
 
@@ -173,18 +174,18 @@ def startup():
 
     conf.init_arguments()
 
-    global sess
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.333)
-    config = tf.ConfigProto(gpu_options=gpu_options)
-    config.gpu_options.allow_growth = True
-    config.allow_soft_placement = True
-    sess = tf.Session(config=config)
+    global ctpn_sess,crnn_sess
+    # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.333)
+    # config = tf.ConfigProto(gpu_options=gpu_options)
+    # config.gpu_options.allow_growth = True
+    # config.allow_soft_placement = True
+    # crnn_sess = tf.Session(config=config)
 
     logger.debug("开始初始化CTPN")
-    ctpn.initialize(sess)
+    ctpn_sess = ctpn.initialize()
 
     logger.debug("开始初始化CRNN")
-    crnn.initialize(sess)
+    crnn_sess = crnn.initialize()
 
     # # 测试代码
     # with open("test/test.png","rb") as f:
