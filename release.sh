@@ -7,6 +7,7 @@ echo "Relase OCR Web程序..."
 git add .
 git add -u
 git commit -m"$TAG"
+git push
 git tag $TAG
 git push --tags
 
@@ -15,6 +16,7 @@ cd ../ctpn
 git add .
 git add -u
 git commit -m"$TAG"
+git push
 git tag $TAG
 git push --tags
 
@@ -23,6 +25,7 @@ cd ../crnn
 git add .
 git add -u
 git commit -m"$TAG"
+git push
 git tag $TAG
 git push --tags
 
