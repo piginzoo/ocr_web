@@ -67,7 +67,7 @@ if [ "$1" == "stress" ];
 then
     echo "压力测试..."
     echo $data > test.data
-    ab -c $CON -n $NUM -p test.data -T 'application/json'  http://localhost:$PORT/ocr
+    ab -s 300 -c $CON -n $NUM -p test.data -T 'application/json'  http://localhost:$PORT/ocr
     echo "压力测试完毕！"
     rm test.data
     exit;
