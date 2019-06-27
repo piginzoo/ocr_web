@@ -1,6 +1,7 @@
 Date=$(date +%Y%m%d%H%M)
-
 TAG="Release_$Date"
+
+echo "#### 开始发布 ####"
 
 echo "Relase OCR Web程序..."
 git add .
