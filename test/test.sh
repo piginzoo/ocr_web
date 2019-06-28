@@ -36,7 +36,7 @@ do
                     ;;
                 -c|--con)
                     echo "并发数：$2"
-                    WORKER=$2
+                    CON=$2
                     shift 2
                     ;;
                 -n|--num)
@@ -67,6 +67,7 @@ if [ "$1" == "stress" ];
 then
     echo "压力测试..."
     echo $data > test.data
+    echo "ab -s 300 -c $CON -n $NUM -p test.data -T 'application/json'  http://localhost:$PORT/ocr"
     ab -s 300 -c $CON -n $NUM -p test.data -T 'application/json'  http://localhost:$PORT/ocr
     echo "压力测试完毕！"
     rm test.data
