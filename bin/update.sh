@@ -7,18 +7,21 @@ echo "#### 使用Release版本：$1 ####"
 
 echo "更新 OCR Web程序..."
 git reset --hard
+git checkout master
 git pull
 git checkout $1
 
 echo "更新 CTPN 程序..."
 cd ../ctpn
 git reset --hard
+git checkout master
 git pull
 git checkout $1
 
 echo "更新 CRNN 程序..."
 cd ../crnn
 git reset --hard
+git checkout master
 git pull
 git checkout $1
 
