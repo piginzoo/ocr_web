@@ -175,17 +175,15 @@ def startup():
     conf.init_arguments()
 
     global ctpn_sess,crnn_sess
-    # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.333)
-    # config = tf.ConfigProto(gpu_options=gpu_options)
-    # config.gpu_options.allow_growth = True
-    # config.allow_soft_placement = True
-    # crnn_sess = tf.Session(config=config)
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.333,allow_growth = True)
+    config = tf.ConfigProto(gpu_options=gpu_options)
+    config.allow_soft_placement = True
 
     logger.debug("开始初始化CTPN")
-    ctpn_sess = ctpn.initialize()
+    ctpn_sess = ctpn.initialize(config)
 
     logger.debug("开始初始化CRNN")
-    crnn_sess = crnn.initialize()
+    crnn_sess = crnn.initialize(config)
 
     # # 测试代码
     # with open("test/test.png","rb") as f:
