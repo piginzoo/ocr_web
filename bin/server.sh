@@ -77,6 +77,7 @@ CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
     --worker-class=gevent \
     --bind=0.0.0.0:$PORT \
     --timeout=300 \
+    --preload \
     server:app \
     \>> ./logs/ocr_server_$Date.log 2>&1 &
 

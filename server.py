@@ -14,16 +14,39 @@ import ocr_utils,time
 import main.pred  as ctpn
 import tools.pred as crnn
 
+import gc
 import os
 import api
 
 DEBUG = False
 
+logging.basicConfig(
+    format='%(asctime)s : %(levelname)s : %(message)s',
+    level=logging.DEBUG,
+    handlers=[logging.StreamHandler()])
+
+logger = logging.getLogger("WebServer")
+
+logger.debug('子进程:%s,父进程:%s,线程:%r', os.getpid(), os.getppid(), current_thread())
+
+conf.init_arguments()
+
+global ctpn_sess, crnn_sess
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.333, allow_growth=True)
+config = tf.ConfigProto(gpu_options=gpu_options)
+config.allow_soft_placement = True
+logger.debug("开始初始化CTPN")
+ctpn_sess = ctpn.initialize(config)
+logger.debug("开始初始化CRNN")
+crnn_sess = crnn.initialize(config)
+
 cwd = os.getcwd()
 app = Flask(__name__,root_path="web")
 app.jinja_env.globals.update(zip=zip)
 
-logger = logging.getLogger("WebServer")
+
+# 参考：https://www.cnblogs.com/haolujun/p/9778939.html
+# gc.freeze() #调用gc.freeze()必须在fork子进程之前，在gunicorn的这个地方调用正好合适，freeze把截止到当前的所有对象放入持久化区域，不进行回收，从而model占用的内存不会被copy-on-write。
 
 def decode2img(buffer):
     logger.debug("从web读取数据len:%r",len(buffer))
@@ -164,32 +187,14 @@ def test():
 
 
 def startup():
-    logging.basicConfig(
-        format='%(asctime)s : %(levelname)s : %(message)s',
-        level=logging.INFO,
-        handlers=[logging.StreamHandler()])
-    logger.debug('子进程:%s,父进程:%s,线程:%r', os.getpid(), os.getppid(), current_thread())
-    logger.debug("初始化TF各类参数")
-    logger.debug('web目录:%s', app.root_path)
-
-    conf.init_arguments()
-
-    global ctpn_sess,crnn_sess
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.333,allow_growth = True)
-    config = tf.ConfigProto(gpu_options=gpu_options)
-    config.allow_soft_placement = True
-
-    logger.debug("开始初始化CTPN")
-    ctpn_sess = ctpn.initialize(config)
-
-    logger.debug("开始初始化CRNN")
-    crnn_sess = crnn.initialize(config)
+    pass
 
     # # 测试代码
     # with open("test/test.png","rb") as f:
     #     image = f.read()
     # process(image,"test.jpg")
 
+if __name__=="__main__":
 
-startup()
+    startup()
 
