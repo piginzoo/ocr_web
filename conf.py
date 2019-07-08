@@ -51,11 +51,12 @@ def init_arguments():
     # 这个是为了兼容
     # gunicorn -w 2 -k gevent web.api_server:app -b 0.0.0.0:8080
     tf.app.flags.DEFINE_string('worker-class', 'gevent', '')
-    tf.app.flags.DEFINE_integer('workers', 2, '')
+    tf.app.flags.DEFINE_integer('workers', 3, '')
     tf.app.flags.DEFINE_string('bind', '0.0.0.0:8080', '')
     tf.app.flags.DEFINE_integer('timeout', 60, '')
     tf.app.flags.DEFINE_string('preload', '', '')
-    tf.app.flags.DEFINE_integer('threads', 1, '')
+    tf.app.flags.DEFINE_integer('worker-connections', 1000, '')
+
 
     # ctpn的
     tf.app.flags.DEFINE_string('ctpn_model_dir', CTPN_MODEL_DIR, '') # model的存放目录，会自动加载最新的那个模型
