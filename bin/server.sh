@@ -73,12 +73,14 @@ fi
 echo "服务器启动... 端口:$PORT 工作进程:$CONNECTION"
 # 参考：https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7
 # worker=3是根据2*CPU+1,用gevent就只能用1个core，所以就是2*1+1=3，写死
-CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
+_CMD="CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
     --worker=3 \
     --worker-class=gevent \
     --worker-connections=$CONNECTION \
     --bind=0.0.0.0:$PORT \
     --timeout=300 \
     server:app \
-    \>> ./logs/ocr_server_$Date.log 2>&1 &
+    \>> ./logs/ocr_server_$Date.log 2>&1 &"
+echo "$_CMD"
+eval $_CMD
 
