@@ -81,7 +81,7 @@ def process(image,image_name="test.jpg",is_verbose=False):
     #     'f1': 0.78
     #     }
     # }, ]
-    global  crnn_sess,ctpn_sess
+    #global  crnn_sess,ctpn_sess
     result = ctpn.pred(ctpn_sess,[image],[image_name],ctpn_graph)
 
     # logger.debug("预测返回结果：%r",result[0])

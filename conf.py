@@ -55,6 +55,7 @@ def init_arguments():
     tf.app.flags.DEFINE_string('bind', '0.0.0.0:8080', '')
     tf.app.flags.DEFINE_integer('timeout', 60, '')
     tf.app.flags.DEFINE_string('preload', '', '')
+    tf.app.flags.DEFINE_integer('threads', 1, '')
 
     # ctpn的
     tf.app.flags.DEFINE_string('ctpn_model_dir', CTPN_MODEL_DIR, '') # model的存放目录，会自动加载最新的那个模型
