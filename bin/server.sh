@@ -31,7 +31,7 @@ fi
 
 # 默认
 PORT=8080
-WORKER=9
+CONNECTION=9
 GPU=1
 
 ARGS=`getopt -o p:c:g: --long port:,connection:,gpu: -n 'help.bash' -- "$@"`
@@ -52,7 +52,7 @@ do
                     ;;
                 -c|--connection)
                     echo "自定义并发数：$2"
-                    WORKER=$2
+                    CONNECTION=$2
                     shift 2
                     ;;
                 -g|--gpu)
@@ -70,13 +70,13 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-echo "服务器启动... 端口:$PORT 工作进程:$WORKER"
+echo "服务器启动... 端口:$PORT 工作进程:$CONNECTION"
 # 参考：https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7
 # worker=3是根据2*CPU+1,用gevent就只能用1个core，所以就是2*1+1=3，写死
 CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
     --worker=3 \
     --worker-class=gevent \
-    --worker-connections= \
+    --worker-connections=$CONNECTION \
     --bind=0.0.0.0:$PORT \
     --timeout=300 \
     server:app \
