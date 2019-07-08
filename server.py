@@ -37,9 +37,9 @@ global ctpn_sess, crnn_sess
 config = tf.ConfigProto()
 config.allow_soft_placement = True
 logger.debug("开始初始化CTPN")
-ctpn_sess = ctpn.initialize(config)
+ctpn_sess,ctpn_graph = ctpn.initialize(config)
 logger.debug("开始初始化CRNN")
-crnn_sess = crnn.initialize(config)
+crnn_sess,crnn_graph = crnn.initialize(config)
 
 cwd = os.getcwd()
 app = Flask(__name__,root_path="web")
@@ -82,11 +82,11 @@ def process(image,image_name="test.jpg",is_verbose=False):
     #     }
     # }, ]
     global  crnn_sess,ctpn_sess
-    result = ctpn.pred(ctpn_sess,[image],[image_name])
+    result = ctpn.pred(ctpn_sess,[image],[image_name],ctpn_graph)
 
     # logger.debug("预测返回结果：%r",result[0])
     small_images = ocr_utils.crop_small_images(image,result[0]['boxes'])
-    all_txt,_ = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,crnn_sess)
+    all_txt,_ = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,crnn_sess,crnn_graph)
     logger.debug("最终的预测结果为：%r",all_txt)
     result[0]['text'] = all_txt    # 小框们的文本们
 
