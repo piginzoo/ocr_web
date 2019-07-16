@@ -32,7 +32,7 @@ logger.debug('子进程:%s,父进程:%s,线程:%r', os.getpid(), os.getppid(), c
 conf.init_arguments()
 
 global ctpn_sess, crnn_sess
-gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2, allow_growth=True)
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3, allow_growth=True)
 config = tf.ConfigProto(gpu_options=gpu_options)
 config.allow_soft_placement = True
 logger.debug("开始初始化CTPN")
