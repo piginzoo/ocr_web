@@ -32,8 +32,8 @@ logger.debug('子进程:%s,父进程:%s,线程:%r', os.getpid(), os.getppid(), c
 conf.init_arguments()
 
 global ctpn_sess, crnn_sess
-#gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.333, allow_growth=True)
-#config = tf.ConfigProto(gpu_options=gpu_options)
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2, allow_growth=True)
+config = tf.ConfigProto(gpu_options=gpu_options)
 config = tf.ConfigProto()
 config.allow_soft_placement = True
 logger.debug("开始初始化CTPN")
@@ -101,7 +101,10 @@ def process(image,image_name="test.jpg",is_verbose=False):
         for r in result:
             # 从opencv的np array格式，转成原始图像，再转成base64
             if r.get('image',None) is not None:
+                logger.debug("返回的大图:%r",r['image'].shape)
                 r['image'] = ocr_utils.nparray2base64(r['image'])
+            else:
+                logger.debug("返回大图为空")
         # logger.debug("最终的预测的子图:%r",result[0]['small_images'])
 
     return True,result[0]

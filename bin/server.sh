@@ -30,11 +30,12 @@ if [ ! "$1" = "start" ]; then
 fi
 
 # 默认
-PORT=8080
-CONNECTION=9
+PORT=8081
+CONNECTION=10
 GPU=1
+WORKER=4
 
-ARGS=`getopt -o p:c:g: --long port:,connection:,gpu: -n 'help.bash' -- "$@"`
+ARGS=`getopt -o p:c:g:w: --long port:,connection:,gpu:,worker: -n 'help.bash' -- "$@"`
 if [ $? != 0 ]; then
     help
     exit 1
@@ -55,6 +56,11 @@ do
                     CONNECTION=$2
                     shift 2
                     ;;
+                -w|--worker)
+                    echo "自定义Worker数：$2"
+                    WORKER=$2
+                    shift 2
+                    ;;
                 -g|--gpu)
                     echo "自定义#GPU：  #$2"
                     GPU=$2
@@ -72,15 +78,16 @@ fi
 
 echo "服务器启动... 端口:$PORT 工作进程:$CONNECTION"
 # 参考：https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7
-# worker=3是根据2*CPU+1,用gevent就只能用1个core，所以就是2*1+1=3，写死
+# worker=4是根据GPU的显存数调整出来的，ration=0.2，大概一个进程占满为2.5G,4x2.5=10G显存
 _CMD="CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
-    --workers=3 \
+    --workers=$WORKER \
     --worker-class=gevent \
     --worker-connections=$CONNECTION \
     --bind=0.0.0.0:$PORT \
     --timeout=300 \
     server:app \
     \>> ./logs/ocr_server_$Date.log 2>&1 &"
+echo "启动服务："
 echo "$_CMD"
 eval $_CMD
 

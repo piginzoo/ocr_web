@@ -51,7 +51,7 @@ def init_arguments():
     # 这个是为了兼容
     # gunicorn -w 2 -k gevent web.api_server:app -b 0.0.0.0:8080
     tf.app.flags.DEFINE_string('worker-class', 'gevent', '')
-    tf.app.flags.DEFINE_integer('workers', 3, '')
+    tf.app.flags.DEFINE_integer('workers', 1, '')
     tf.app.flags.DEFINE_string('bind', '0.0.0.0:8080', '')
     tf.app.flags.DEFINE_integer('timeout', 60, '')
     tf.app.flags.DEFINE_string('preload', '', '')
