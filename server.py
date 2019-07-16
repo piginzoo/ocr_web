@@ -34,7 +34,6 @@ conf.init_arguments()
 global ctpn_sess, crnn_sess
 gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2, allow_growth=True)
 config = tf.ConfigProto(gpu_options=gpu_options)
-config = tf.ConfigProto()
 config.allow_soft_placement = True
 logger.debug("开始初始化CTPN")
 ctpn_sess,ctpn_graph = ctpn.initialize(config)
