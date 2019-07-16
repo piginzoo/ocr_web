@@ -1,6 +1,7 @@
 import json,base64
 import logging
 from json.decoder import JSONDecodeError
+import datetime
 logger = logging.getLogger("API")
 '''
 请求的报文：
@@ -89,9 +90,12 @@ def post_process(result,width,height):
 
         text+= result['text'][i] + " "
 
+    # 返回日期到毫秒级作为当前的请求的id
+    sid = datetime.datetime.now().strftime("%Y%m%d%H%S%f")[:-3]
+
     return \
     {
-        "sid": "NS-OCR-RECOGNITION",
+        "sid": sid,
         "prism_version": "1.0",
         "prism_wnum": len(result),
         "prism_wordsInfo": prism_wordsInfo,
