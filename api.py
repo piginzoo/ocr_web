@@ -93,7 +93,7 @@ def post_process(result,width,height):
     # 返回日期到毫秒级作为当前的请求的id
     sid = datetime.datetime.now().strftime("%Y%m%d%H%S%f")[:-3]
 
-    return \
+    result = \
     {
         "sid": sid,
         "prism_version": "1.0",
@@ -105,6 +105,8 @@ def post_process(result,width,height):
         "orgWidth": width,
         "content": text
     }
+    logger.debug("图片最终识别结果：%r",result)
+    return result
 
 def covert2xy(xy_list):
     return \
