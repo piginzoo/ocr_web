@@ -38,8 +38,8 @@ def disable_debug_flags():
     tf.app.flags.FLAGS.remove_flag_values({'draw':True})
     tf.app.flags.FLAGS.remove_flag_values({'save':True})
     tf.app.flags.DEFINE_boolean('evaluate', False, '')  # 是否进行评价（你可以光预测，也可以一边预测一边评价）
-    tf.app.flags.DEFINE_boolean('split',    False, '')     # 是否对小框做出评价，和画到图像上
-    tf.app.flags.DEFINE_boolean('draw',     False, '')      # 是否把gt和预测画到图片上保存下来，保存目录也是pred_home
+    tf.app.flags.DEFINE_boolean('split',    True, '')     # 是否对小框做出评价，和画到图像上
+    tf.app.flags.DEFINE_boolean('draw',     True, '')      # 是否把gt和预测画到图片上保存下来，保存目录也是pred_home
     tf.app.flags.DEFINE_boolean('save',     False, '')      # 是否保存输出结果（大框、小框信息都要保存），保存到pred_home目录里面去
 
 # 定义各类参数

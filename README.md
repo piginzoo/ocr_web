@@ -4,4 +4,24 @@ The project use flask as its web server, and run with gunicorn gateway, here som
 
 The ocr can support you to send your image to us by 2 ways: base64 or http post, the result will be a picture drawn by all detected zones, and also texts recognized by crrn.
 
-    
+# crnn json format
+request json:
+[
+    {"img":"GHJKFGHJKFGHJKGHJKGHJK"},
+    {"img":"GHJKFGHJKFGHJKGHJKGHJK"},
+    {"img":"GHJKFGHJKFGHJKGHJKGHJK"},
+    {"img":"GHJKFGHJKFGHJKGHJKGHJK"},
+    {"img":"GHJKFGHJKFGHJKGHJKGHJK"},
+]
+
+response json:
+{
+    "sid":"6c8f999fe94",
+    "prism_wordsInfo":[
+        {"word":"供审核使用1"},
+        {"word":"核实图片1"},
+        {"word":"供审核使用1"},
+        {"word":"核实图片1"},
+        {"word":"供审核使用1"}        
+    ]
+}

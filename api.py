@@ -3,6 +3,23 @@ import logging
 from json.decoder import JSONDecodeError
 import datetime
 logger = logging.getLogger("API")
+
+
+
+def json2dict(request):
+    str_data = request.get_data()
+    logger.debug("Got CRNN data:%d bytes",len(str_data))
+    data = str_data.decode('utf-8')
+    try:
+        data = data.replace('\r\n', '')
+        data = data.replace('\n', '')
+        data = json.loads(data)
+    except JSONDecodeError as e:
+        logger.error(data)
+        logger.error("JSon数据格式错误")
+        raise  Exception("JSon数据格式错误:"+str(e))
+    return data
+
 '''
 请求的报文：
 {
@@ -17,22 +34,8 @@ logger = logging.getLogger("API")
 处理调用的参数，还原图片
 '''
 def process_request(request):
-    # base64_data = request.form.get('img','')
-    str_data = request.get_data()
-    logger.debug("Got data:%d bytes",len(str_data))
-    # import requests
-    # requests.get(url).json()
 
-    data = str_data.decode('utf-8')
-
-    try:
-        data = data.replace('\r\n', '')
-        data = data.replace('\n', '')
-        data = json.loads(data)
-    except JSONDecodeError as e:
-        logger.error(data)
-        logger.error("JSon数据格式错误")
-        raise  Exception("JSon数据格式错误:"+str(e))
+    data = json2dict(request)
 
     base64_data = data['img']
     logger.debug("Got image ,size:%d",len(base64_data))
@@ -46,6 +49,40 @@ def process_request(request):
     logger.debug("Convert image to bytes by base64, lenght:%d",len(buffer))
 
     return buffer
+
+def process_crnn_request(request):
+    data = json2dict(request)
+
+    image_data = []
+    for d in data:
+        base64_data = d['img']
+        index = base64_data.find(",")
+        if index!=-1: base64_data = base64_data[index+1:]
+        # print(base64_data)
+        # 降base64转化成byte数组
+        buffer = base64.b64decode(base64_data)
+        image_data.append(buffer)
+
+    return image_data
+
+def post_crnn_process(result):
+    prism_wordsInfo = []
+    for i,b in enumerate(result):
+        one = {}
+        one['word'] = b
+        prism_wordsInfo.append(one)
+
+    # 返回日期到毫秒级作为当前的请求的id
+    sid = datetime.datetime.now().strftime("%Y%m%d%H%S%f")[:-3]
+
+    result = \
+    {
+        "sid": sid,
+        "prism_wordsInfo": prism_wordsInfo,
+    }
+    logger.debug("图片最终识别结果：%r",result)
+    return result
+
 
 
 '''

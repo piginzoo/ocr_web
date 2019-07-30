@@ -85,9 +85,7 @@ def process(image,image_name="test.jpg",is_verbose=False):
 
     # logger.debug("预测返回结果：%r",result[0])
     small_images = ocr_utils.crop_small_images(image,result[0]['boxes'])
-    all_txt,_ = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,crnn_sess,crnn_graph)
-    logger.debug("最终的预测结果为：%r",all_txt)
-    result[0]['text'] = all_txt    # 小框们的文本们
+    result[0]['text'] = process_crnn(small_images)    # 小框们的文本们
 
     # 仅仅调试CTPN
     # all_txt = ['']*len(small_images)
@@ -109,12 +107,43 @@ def process(image,image_name="test.jpg",is_verbose=False):
     return True,result[0]
 
 
+def process_crnn(small_images):
+    all_txt,_ = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,crnn_sess,crnn_graph)
+    logger.debug("最终的预测结果为：%r",all_txt)
+    return all_txt
+
+
+
 @app.route("/")
 def index():
     # with open("../version") as f:
     #     version = f.read()
     return render_template('index.html',version="version")
 
+
+# base64编码的小图片的识别，这个制作OCR文字识别，不做文字弹出了
+@app.route('/crnn',methods=['POST'])
+def do_crnn():
+    result = None
+    try:
+        conf.disable_debug_flags() # 不用处理调试的动作，但是对post方式，还是保留
+        buffers = api.process_crnn_request(request)
+        images = []
+        for b in buffers:
+            image = decode2img(b)
+            images.append(image)
+        result = process_crnn(images)  # 小框们的文本们
+        result = api.post_crnn_process(result)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        logger.error("处理图片过程中出现问题：%r", e)
+        return jsonify({'error_code': -1, 'message': str(e)})
+
+    if result is None:
+        return jsonify({'error_code': -1, 'message': 'image resolve fail'})
+    else:
+        return jsonify(result)
 
 # base64编码的图片识别
 @app.route('/ocr',methods=['POST'])
