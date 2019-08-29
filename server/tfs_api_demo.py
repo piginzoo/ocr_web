@@ -13,6 +13,9 @@ tf.app.flags.DEFINE_string('IP', '127.0.0.1', '')
 tf.app.flags.DEFINE_string('imgn', 'test.JPG', '')
 FLAGS = tf.app.flags.FLAGS
 
+print("FLAGS", FLAGS)
+
+
 class Channels:
     def __init__(self):
         def newChannel(name):
@@ -54,7 +57,7 @@ def test():
     imgName = FLAGS.imgn
     image = cv2.imread(imgName)
     image, _ = resize_image(image, 1200, 1600)
-    #image = image[:, :, ::-1]
+    # image = image[:, :, ::-1]
     print("image.shape", image.shape)
     h, w, c = image.shape
     im_info = np.array([h, w, c]).reshape([1, 3])
@@ -102,5 +105,7 @@ def resize_image(image, smaller_max, larger_max):
 
 
 if __name__ == '__main__':
+    print("imgn", FLAGS.imgn)
+    print("IP", FLAGS.IP)
     test()
     pass
