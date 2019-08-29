@@ -4,15 +4,19 @@
 """
 
 import logging
+import os
 
 import cv2
 import numpy as np
-import os
 import tensorflow as tf
 from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
 
+import conf
+import module.crnn.utils.image_util as image_util
+import ocr_utils
+from module.crnn.config import config
 from module.ctpn import ctpn_handle
 from module.ctpn.utils.prepare import image_utils
 from module.ctpn.utils.rpn_msr.proposal_layer import proposal_layer
@@ -87,11 +91,53 @@ crnn = channels.getCrnnRequest()
 logger.info("crnn channel %s", crnn)
 
 
-def test():
+def pridict():
     imgPath = FLAGS.imgn
     (_, image_name) = os.path.split(imgPath)
     original_img = cv2.imread(imgPath)
     image, scale = image_utils.resize_image(original_img, 1200, 1600)
+    # ctpn_predict
+    result = ctpn_predict(original_img, image, scale, image_name)
+    small_images = ocr_utils.crop_small_images(image, result[0]['boxes'])
+    # crnn_predict
+    crnn_predict(small_images, conf.CRNN_BATCH_SIZE)
+
+
+# crnn predict
+def crnn_predict(image_list, _batch_size):
+    pred_result = []  # 预测结果，每个元素是一个字符串
+    prob_result = []  # 预测结果概率
+    for i in range(0, len(image_list), _batch_size):
+        # 计算实际的batch大小，最后一批数量可能会少一些
+        begin = i
+        end = i + _batch_size
+        if begin + _batch_size > len(image_list):
+            end = len(image_list)
+        count = end - begin
+
+        logger.debug("从所有图像[%d]抽取批次，从%d=>%d", len(image_list), begin, end)
+        _input_data = image_list[begin:end]
+
+        # _input_data = prepare_data(_input_data)
+        _input_data = image_util.resize_batch_image(_input_data, config.INPUT_SIZE, FLAGS.resize_mode)
+
+        # batch_size，也就是CTC的sequence_length数组要求的格式是：
+        # 长度是batch个，数组每个元素是sequence长度，也就是64个像素 [64,64,...64]一共batch个。
+        _batch_size_array = np.array(count * [config.SEQ_LENGTH]).astype(np.int32)
+
+        crnn["request"].inputs["inputdata"].ParseFromString(
+            tf.contrib.util.make_tensor_proto(_input_data, dtype=tf.float32).SerializeToString())
+        crnn["request"].inputs["batch_size"].ParseFromString(
+            tf.contrib.util.make_tensor_proto(_batch_size_array, dtype=tf.int32).SerializeToString())
+        logger.info("send predict request begin")
+        response = crnn["stub"].Predict(crnn["request"], 60.0)
+        logger.info("send predict request end")
+
+        logger.info("crnn:%s", response)
+
+
+# ctpn predict
+def ctpn_predict(original_img, image, scale, image_name):
     logger.info("image.shape:%s", image.shape)
     h, w, c = image.shape
     logger.debug('图像的h,w,c:%d,%d,%d', h, w, c)
@@ -115,7 +161,7 @@ def test():
     logger.debug("send predict request ===>>> results > cls_prob:%s", cls_prob)
     logger.debug("send predict request ===>>> results > bbox_pred:%s", bbox_pred)
 
-    logger.info("start handel cls_prob")
+    logger.info("ctpn start handel cls_prob,bbox_pred")
     stat = ctpn_handle.cls_prob_val_reshape_debug_stat(cls_prob)
     logger.debug("前景返回概率情况:%s", stat)
 
@@ -141,11 +187,16 @@ def test():
     draw_image, f1 = ctpn_handle.post_detect(bbox_small, boxes_big, image_name, original_img, scores)
     if draw_image is not None: _image['image'] = draw_image
     if draw_image is not None: _image['f1'] = f1
-    logger.info("ctpn end by result:%s", _image)
+    logger.debug("ctpn end handle cls_prob,bbox_pred, by result:%s", _image)
+    result = []
+    result.append(_image)
+    return result
 
+
+#    _image['text']= crnn result
 
 if __name__ == '__main__':
     logger.info("IP:%s, imgn:%s", FLAGS.IP, FLAGS.imgn)
     init_params()
-    test()
+    pridict()
     pass
