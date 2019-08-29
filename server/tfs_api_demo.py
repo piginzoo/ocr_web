@@ -2,6 +2,8 @@
 """
 """
 
+import logging
+
 import cv2
 import numpy as np
 import tensorflow as tf
@@ -13,7 +15,13 @@ tf.app.flags.DEFINE_string('IP', '127.0.0.1', '')
 tf.app.flags.DEFINE_string('imgn', 'test.JPG', '')
 FLAGS = tf.app.flags.FLAGS
 
-print("FLAGS", FLAGS)
+logging.basicConfig(
+    format='%(asctime)s - %(levelname)s : %(message)s',
+    level=logging.DEBUG,
+    handlers=[logging.StreamHandler()])
+logger = logging.getLogger("WebServer")
+
+logger.info("flags:%s", FLAGS)
 
 
 class Channels:
@@ -37,6 +45,7 @@ class Channels:
             "stub": predStub,
             "request": predRequest
         }
+        logger.info("Channels init success")
         pass
 
     def getCrnnRequest(self):
@@ -48,28 +57,30 @@ class Channels:
 
 channels = Channels()
 ctpn = channels.getCtpnnRequest()
-print("ctpn", ctpn)
+logger.info("ctpn channel %s", ctpn)
 crnn = channels.getCrnnRequest()
-print("crnn", crnn)
+logger.info("crnn channel %s", crnn)
 
 
 def test():
     imgName = FLAGS.imgn
     image = cv2.imread(imgName)
     image, _ = resize_image(image, 1200, 1600)
-    # image = image[:, :, ::-1]
-    print("image.shape", image.shape)
-    h, w, c = image.shape
-    im_info = np.array([h, w, c]).reshape([1, 3])
-    print("im_info", im_info)
+    logger.info("image.shape:%s", image.shape)
     image = np.array([image])
 
     ctpn["request"].inputs["input_image"].ParseFromString(
         tf.contrib.util.make_tensor_proto(image, dtype=tf.float32).SerializeToString())
-    # ctpn["request"].inputs["input_im_info"].ParseFromString(
-    #     tf.contrib.util.make_tensor_proto([], dtype=tf.float32).SerializeToString())
+    logger.info("send predict request begin")
     response = ctpn["stub"].Predict(ctpn["request"], 60.0)
-    print("response", response)
+    logger.info("send predict request end")
+
+    results = {}
+    for key in response.outputs:
+        tensor_proto = response.outputs[key]
+        results[key] = tf.contrib.util.make_ndarray(tensor_proto)
+
+    logger.info("send predict request ===>>> results:%s", results)
 
 
 # 看哪个大了，就缩放哪个，规定大边的最大，和小边的最大
@@ -99,13 +110,11 @@ def resize_image(image, smaller_max, larger_max):
 
     # https://www.jianshu.com/p/11879a49d1a0 关于resize
     image = cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
-    cv2.imwrite("data/test.jpg", image)
+    # cv2.imwrite("data/test.jpg", image)
 
     return image, scale
 
 
 if __name__ == '__main__':
-    print("imgn", FLAGS.imgn)
-    print("IP", FLAGS.IP)
     test()
     pass
