@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+    说明：
 """
 
 import logging
@@ -10,6 +11,11 @@ import tensorflow as tf
 from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
+
+from module.ctpn import ctpn_handle
+from module.ctpn.utils.rpn_msr.proposal_layer import proposal_layer
+from module.ctpn.utils.text_connector.detectors import TextDetector
+from module.ctpn.utils.prepare import image_utils
 
 tf.app.flags.DEFINE_string('IP', '127.0.0.1', '')
 tf.app.flags.DEFINE_string('imgn', 'test.JPG', '')
@@ -64,9 +70,12 @@ logger.info("crnn channel %s", crnn)
 
 def test():
     imgName = FLAGS.imgn
-    image = cv2.imread(imgName)
-    image, _ = resize_image(image, 1200, 1600)
+    original_img = cv2.imread(imgName)
+    image, scale = image_utils.resize_image(original_img, 1200, 1600)
     logger.info("image.shape:%s", image.shape)
+    h, w, c = image.shape
+    logger.debug('图像的h,w,c:%d,%d,%d', h, w, c)
+    im_info = np.array([h, w, c]).reshape([1, 3])
     image = np.array([image])
 
     ctpn["request"].inputs["input_image"].ParseFromString(
@@ -80,41 +89,38 @@ def test():
         tensor_proto = response.outputs[key]
         results[key] = tf.contrib.util.make_ndarray(tensor_proto)
 
-    logger.info("send predict request ===>>> results:%s", results)
+    cls_prob = results["output_cls_prob"]
+    bbox_pred = results["output_bbox_pred"]
 
+    logger.debug("send predict request ===>>> results > cls_prob:%s", cls_prob)
+    logger.debug("send predict request ===>>> results > bbox_pred:%s", bbox_pred)
 
-# 看哪个大了，就缩放哪个，规定大边的最大，和小边的最大
-def resize_image(image, smaller_max, larger_max):
-    h, w, _ = image.shape  # H,W
+    logger.info("start handel cls_prob")
+    stat = ctpn_handle.cls_prob_val_reshape_debug_stat(cls_prob)
+    logger.debug("前景返回概率情况:%s", stat)
 
-    # ----
-    # |  |
-    # |  |
-    # |__|
-    if h > w:
-        if h < larger_max and w < smaller_max:
-            return image, 1
-        h_scale = larger_max / h
-        w_scale = smaller_max / w
-        # print("h_scale",h_scale,"w_scale",w_scale)
-        scale = min(h_scale, w_scale)  # scale肯定是小于1的，越小说明缩放要厉害，所以谁更小，取谁
-    # ___________
-    # |         |
-    # |_________|
-    else:  # h<w
-        if h < smaller_max and w < larger_max:
-            return image, 1
-        h_scale = smaller_max / h
-        w_scale = larger_max / w
-        scale = min(h_scale, w_scale)  # scale肯定是小于1的，越小说明缩放要厉害，所以谁更小，取谁
+    # 返回所有的base anchor调整后的小框，是矩形
+    textsegs, _ = proposal_layer(cls_prob, bbox_pred, im_info)
 
-    # https://www.jianshu.com/p/11879a49d1a0 关于resize
-    image = cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
-    # cv2.imwrite("data/test.jpg", image)
+    scores = textsegs[:, 0]
+    textsegs = textsegs[:, 1:5]  # 这个是小框，是一个矩形 [1:5]=>1,2,3,4
 
-    return image, scale
+    textdetector = TextDetector(DETECT_MODE='H')
+    # 文本检测算法，用于把小框合并成一个4边型（不一定是矩形）
+    boxes = textdetector.detect(textsegs, scores[:, np.newaxis], image.shape[:2])
+    # box是9个值，4个点，8个值了吧，还有个置信度：全部小框得分的均值作为文本行的均值
+    boxes = np.array(boxes, dtype=np.int)
+    # boxes, scores, textsegs
+
+    # scale 放大 unresize back回去
+    boxes_big = np.array(image_utils.resize_labels(boxes[:, :8], 1 / scale))
+    bbox_small = np.array(image_utils.resize_labels(textsegs, 1 / scale))
+
+    logger.info("end")
+    # draw_image, f1 = post_detect(bbox_small, boxes_big, image_name, original_img, scores)
 
 
 if __name__ == '__main__':
+    logger.info("IP:%s, imgn:%s", FLAGS.IP, FLAGS.imgn)
     test()
     pass
