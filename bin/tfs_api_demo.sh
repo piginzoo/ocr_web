@@ -3,8 +3,9 @@
 Date=$(date +%Y%m%d%H%M)
 
 imgn=$1
-
+IP=$2
 echo "TFS api test demo"
 
-python -m server.tfs_api_demo \
-    --imgn=$imgn
+nohup python -m server.tfs_api_demo \
+    --imgn=$imgn --IP=$2 \
+    >> ./logs/tfs_api_demo_$Date.log 2>&1 &
