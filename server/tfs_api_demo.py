@@ -7,15 +7,34 @@ import logging
 
 import cv2
 import numpy as np
+import os
 import tensorflow as tf
 from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
 
 from module.ctpn import ctpn_handle
+from module.ctpn.utils.prepare import image_utils
 from module.ctpn.utils.rpn_msr.proposal_layer import proposal_layer
 from module.ctpn.utils.text_connector.detectors import TextDetector
-from module.ctpn.utils.prepare import image_utils
+
+
+def init_params():
+    tf.app.flags.DEFINE_boolean('debug', True, '')
+    tf.app.flags.DEFINE_boolean('evaluate', True, '')  # 是否进行评价（你可以光预测，也可以一边预测一边评价）
+    tf.app.flags.DEFINE_boolean('split', True, '')  # 是否对小框做出评价，和画到图像上
+    tf.app.flags.DEFINE_string('test_dir', '', '')  # 被预测的图片目录
+    tf.app.flags.DEFINE_string('image_name', '', '')  # 被预测的图片名字，为空就预测目录下所有的文件
+    tf.app.flags.DEFINE_string('pred_dir', 'data/pred', '')  # 预测后的结果的输出目录
+    tf.app.flags.DEFINE_boolean('draw', True, '')  # 是否把gt和预测画到图片上保存下来，保存目录也是pred_dir
+    tf.app.flags.DEFINE_boolean('save', True, '')  # 是否保存输出结果（大框、小框信息都要保存），保存到pred_dir目录里面去
+    tf.app.flags.DEFINE_string('ctpn_model_dir', 'model/', '')  # model的存放目录，会自动加载最新的那个模型
+    tf.app.flags.DEFINE_string('ctpn_model_file', '', '')  # 为了支持单独文件，如果为空，就预测test_dir中的所有文件
+
+    tf.app.flags.DEFINE_string('test_images_dir', '', '')
+    tf.app.flags.DEFINE_string('test_labels_dir', '', '')
+    tf.app.flags.DEFINE_string('test_labels_split_dir', '', '')
+
 
 tf.app.flags.DEFINE_string('IP', '127.0.0.1', '')
 tf.app.flags.DEFINE_string('imgn', 'test.JPG', '')
@@ -69,8 +88,9 @@ logger.info("crnn channel %s", crnn)
 
 
 def test():
-    imgName = FLAGS.imgn
-    original_img = cv2.imread(imgName)
+    imgPath = FLAGS.imgn
+    (_, image_name) = os.path.split(imgPath)
+    original_img = cv2.imread(imgPath)
     image, scale = image_utils.resize_image(original_img, 1200, 1600)
     logger.info("image.shape:%s", image.shape)
     h, w, c = image.shape
@@ -116,11 +136,16 @@ def test():
     boxes_big = np.array(image_utils.resize_labels(boxes[:, :8], 1 / scale))
     bbox_small = np.array(image_utils.resize_labels(textsegs, 1 / scale))
 
-    logger.info("end")
-    # draw_image, f1 = post_detect(bbox_small, boxes_big, image_name, original_img, scores)
+    _image = {'name': image_name, 'boxes': boxes_big}
+
+    draw_image, f1 = ctpn_handle.post_detect(bbox_small, boxes_big, image_name, original_img, scores)
+    if draw_image is not None: _image['image'] = draw_image
+    if draw_image is not None: _image['f1'] = f1
+    logger.info("ctpn end by result:%s", _image)
 
 
 if __name__ == '__main__':
     logger.info("IP:%s, imgn:%s", FLAGS.IP, FLAGS.imgn)
+    init_params()
     test()
     pass

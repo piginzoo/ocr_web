@@ -3,6 +3,7 @@ import logging
 
 import numpy as np
 
+from module.ctpn.utils.bbox.nms import nms  # 原来是 from nms import nms
 from .text_connect_cfg import Config as TextLineCfg
 from .text_proposal_connector import TextProposalConnector
 from .text_proposal_connector_oriented import TextProposalConnectorOriented
