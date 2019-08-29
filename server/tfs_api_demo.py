@@ -9,11 +9,14 @@ from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
 
+tf.app.flags.DEFINE_string('IP', '127.0.0.1', '')
+tf.app.flags.DEFINE_string('imgn', 'test.JPG', '')
+FLAGS = tf.app.flags.FLAGS
 
 class Channels:
     def __init__(self):
         def newChannel(name):
-            channel = implementations.insecure_channel("10.100.146.166", 8500)
+            channel = implementations.insecure_channel(FLAGS.IP, 8500)
             stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
             # 预测请求
             request = predict_pb2.PredictRequest()
@@ -48,10 +51,10 @@ print("crnn", crnn)
 
 
 def test():
-    imgName = "test.JPG"
+    imgName = FLAGS.imgn
     image = cv2.imread(imgName)
-    #image, _ = resize_image(image, 1200, 1600)
-    image = image[:, :, ::-1]
+    image, _ = resize_image(image, 1200, 1600)
+    #image = image[:, :, ::-1]
     print("image.shape", image.shape)
     h, w, c = image.shape
     im_info = np.array([h, w, c]).reshape([1, 3])
