@@ -34,6 +34,7 @@ def init_params():
     tf.app.flags.DEFINE_boolean('save', True, '')  # 是否保存输出结果（大框、小框信息都要保存），保存到pred_dir目录里面去
     tf.app.flags.DEFINE_string('ctpn_model_dir', 'model/', '')  # model的存放目录，会自动加载最新的那个模型
     tf.app.flags.DEFINE_string('ctpn_model_file', '', '')  # 为了支持单独文件，如果为空，就预测test_dir中的所有文件
+    tf.app.flags.DEFINE_string('resize_mode', 'PAD', '')
 
     tf.app.flags.DEFINE_string('test_images_dir', '', '')
     tf.app.flags.DEFINE_string('test_labels_dir', '', '')
@@ -98,7 +99,8 @@ def pridict():
     image, scale = image_utils.resize_image(original_img, 1200, 1600)
     # ctpn_predict
     result = ctpn_predict(original_img, image, scale, image_name)
-    small_images = ocr_utils.crop_small_images(image, result[0]['boxes'])
+    result_image = result[0]['boxes']
+    small_images = ocr_utils.crop_small_images(original_img, result_image)
     # crnn_predict
     crnn_predict(small_images, conf.CRNN_BATCH_SIZE)
 
@@ -117,7 +119,7 @@ def crnn_predict(image_list, _batch_size):
 
         logger.debug("从所有图像[%d]抽取批次，从%d=>%d", len(image_list), begin, end)
         _input_data = image_list[begin:end]
-
+        logger.debug("抽取批次结果：%s", _input_data)
         # _input_data = prepare_data(_input_data)
         _input_data = image_util.resize_batch_image(_input_data, config.INPUT_SIZE, FLAGS.resize_mode)
 
@@ -142,6 +144,7 @@ def ctpn_predict(original_img, image, scale, image_name):
     h, w, c = image.shape
     logger.debug('图像的h,w,c:%d,%d,%d', h, w, c)
     im_info = np.array([h, w, c]).reshape([1, 3])
+    image = image[:, :, ::-1]
     image = np.array([image])
 
     ctpn["request"].inputs["input_image"].ParseFromString(
@@ -159,7 +162,8 @@ def ctpn_predict(original_img, image, scale, image_name):
     bbox_pred = results["output_bbox_pred"]
 
     logger.debug("send predict request ===>>> results > cls_prob:%s", cls_prob)
-    logger.debug("send predict request ===>>> results > bbox_pred:%s", bbox_pred)
+    #logger.debug("send predict request ===>>> results > bbox_pred:%s , shape:%s", bbox_pred, bbox_pred.shape)
+    logger.debug("send predict request ===>>> results > bbox_pred:%s , shape:%s", bbox_pred[0][0][0], bbox_pred.shape)
 
     logger.info("ctpn start handel cls_prob,bbox_pred")
     stat = ctpn_handle.cls_prob_val_reshape_debug_stat(cls_prob)
@@ -176,6 +180,8 @@ def ctpn_predict(original_img, image, scale, image_name):
     boxes = textdetector.detect(textsegs, scores[:, np.newaxis], image.shape[:2])
     # box是9个值，4个点，8个值了吧，还有个置信度：全部小框得分的均值作为文本行的均值
     boxes = np.array(boxes, dtype=np.int)
+    logger.debug("results > boxes:%s , shape:%s", boxes, boxes.shape)
+    logger.debug("results > boxes:%s , shape:%s", boxes[0], boxes.shape)
     # boxes, scores, textsegs
 
     # scale 放大 unresize back回去
@@ -184,10 +190,14 @@ def ctpn_predict(original_img, image, scale, image_name):
 
     _image = {'name': image_name, 'boxes': boxes_big}
 
+    logger.debug("_image:%s", _image)
+
     draw_image, f1 = ctpn_handle.post_detect(bbox_small, boxes_big, image_name, original_img, scores)
-    if draw_image is not None: _image['image'] = draw_image
-    if draw_image is not None: _image['f1'] = f1
-    logger.debug("ctpn end handle cls_prob,bbox_pred, by result:%s", _image)
+    if draw_image is not None:
+        logger.info("draw_image is not None")
+        _image['image'] = draw_image
+        _image['f1'] = f1
+    logger.debug("ctpn end handle cls_prob,bbox_pred, by result:%s", draw_image)
     result = []
     result.append(_image)
     return result

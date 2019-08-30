@@ -13,7 +13,8 @@ from module.ctpn.utils.dataset import data_provider as data_provider
 from module.ctpn.utils.evaluate.evaluator import *
 from module.ctpn.utils.rpn_msr.config import Config
 
-logger = logging.getLogger("WebServer")
+logger = logging.getLogger("ctpn_handle")
+
 FLAGS = tf.app.flags.FLAGS
 
 
@@ -136,7 +137,6 @@ def post_detect(bbox_small, boxes_big, image_name, original_img, scores):
 
         out_image_path = os.path.join(pred_draw_path, os.path.basename(image_name))
         cv2.imwrite(out_image_path, draw_image)
-
         logger.debug("绘制预测和GT到图像完毕：%s", out_image_path)
     # 是否保存预测结果（包括大框和小框）=> data/pred目录
     if FLAGS.save:
