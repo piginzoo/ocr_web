@@ -90,6 +90,7 @@ def decode2img(buffer):
 def index():
     # with open("../version") as f:
     #     version = f.read()
+    logger.info("index time:%s", time.time())
     return render_template('index.html', version="version")
 
 
@@ -171,7 +172,7 @@ def ocr():
         abort(500)
         abort(Response('解析Web传入的图片失败'))
 
-    logger.debug("获得上传图片[%s]，尺寸：%d 字节", image_name, len(image))
+    logger.info("获得上传图片[%s]，尺寸：%d 字节", image_name, len(image))
     start = time.time()
     result = pridict(image, image_name, is_verbose=True)
     logger.info("识别图片[%s]花费[%d]秒", image_name, time.time() - start)
