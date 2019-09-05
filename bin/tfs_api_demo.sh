@@ -6,9 +6,9 @@ imgn=$1
 IP=$2
 echo "TFS api test demo"
 
-python -m server.tfs_api_demo \
-    --imgn=$imgn --IP=$2
+#python -m server.tfs_api_demo \
+#    --imgn=$imgn --IP=$2
 
-#nohup python -m server.tfs_api_demo \
-#    --imgn=$imgn --IP=$2 \
-#    >> ./logs/tfs_api_demo_$Date.log 2>&1 &
+nohup python -m server.tfs_api_demo \
+    --imgn=$imgn --IP=$2 \
+    >> ./logs/tfs_api_demo_$Date.log 2>&1 &

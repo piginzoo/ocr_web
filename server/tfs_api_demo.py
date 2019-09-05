@@ -9,7 +9,7 @@ import os
 import cv2
 import tensorflow as tf
 
-from config import conf
+from config import param_config
 import ocr_utils
 from module.crnn import crnn
 from module.ctpn import ctpn
@@ -35,7 +35,7 @@ def pridict():
     result_image = result[0]['boxes']
     small_images = ocr_utils.crop_small_images(original_img, result_image)
     # crnn_predict
-    crnn_result = crnn.crnn_predict(small_images, conf.CRNN_BATCH_SIZE)
+    crnn_result = crnn.crnn_predict(small_images, param_config.CRNN_BATCH_SIZE)
     result[0]['text'] = crnn_result
     return result[0]
 

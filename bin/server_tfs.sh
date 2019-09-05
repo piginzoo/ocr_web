@@ -21,7 +21,7 @@ fi
 
 if [ "$1" = "stop" ]; then
     echo "停止 OCR Web 服务"
-    ps aux|grep gunicorn|grep -v grep|awk '{print $2}'|xargs kill -9
+    ps aux|grep server.server_tfs|grep -v grep|awk '{print $2}'|xargs kill -9
     exit
 fi
 

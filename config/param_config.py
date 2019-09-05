@@ -26,7 +26,7 @@ CRNN_MODEL_FILE = "crnn_2019-06-27-05-06-48.ckpt-58000"
 # CRNN_MODEL_FILE= "LATEST"
 CRNN_MODEL_DIR = "../models"
 CRNN_CHARSET_FILE = "../crnn/charset.3770.txt"
-CRNN_BATCH_SIZE = 32
+CRNN_BATCH_SIZE = 128
 
 # 通用的调试开关
 DEBUG = True
