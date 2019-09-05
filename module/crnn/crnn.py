@@ -37,7 +37,7 @@ def crnn_predict(image_list, _batch_size):
         # batch_size，也就是CTC的sequence_length数组要求的格式是：
         # 长度是batch个，数组每个元素是sequence长度，也就是64个像素 [64,64,...64]一共batch个。
         _batch_size_array = np.array(count * [config.SEQ_LENGTH]).astype(np.int32)
-        logger.debug("_batch_size_array:%s", _batch_size_array)
+        #logger.debug("_batch_size_array:%s", _batch_size_array)
 
         channel.crnn["request"].inputs["input_data"].ParseFromString(
             tf.contrib.util.make_tensor_proto(np.array(_input_data), dtype=tf.float32).SerializeToString())
@@ -47,7 +47,8 @@ def crnn_predict(image_list, _batch_size):
         response = channel.crnn["stub"].Predict(channel.crnn["request"], 60.0)
         logger.info("crnn send predict request end")
 
-        logger.debug("crnn:%s", response)
+        #logger.debug("crnn:%s", response)
+
         results = {}
         for key in response.outputs:
             tensor_proto = response.outputs[key]
