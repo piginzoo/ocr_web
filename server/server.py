@@ -1,10 +1,11 @@
 #-*- coding:utf-8 -*- 
 from flask import Flask,jsonify,request,abort,render_template,Response
-import base64,cv2,json,sys,numpy as np
+import base64,cv2, numpy as np
 import sys,logging,os
-import conf
+from config import conf
+
 # 为了集成项目,把CTPN和CRNN项目的绝对路径加到python类路径里面
-for path in conf.CRNN_HOME+conf.CTPN_HOME:
+for path in conf.CRNN_HOME + conf.CTPN_HOME:
     sys.path.insert(0, os.path.join(os.path.abspath(os.pardir), path))
 import tensorflow as tf
 from threading import current_thread
@@ -14,7 +15,6 @@ import ocr_utils,time
 import main.pred  as ctpn
 import tools.pred as crnn
 
-import gc
 import os
 import api
 
@@ -108,7 +108,7 @@ def process(image,image_name="test.jpg",is_verbose=False):
 
 
 def process_crnn(small_images):
-    all_txt,_ = crnn.pred(small_images,conf.CRNN_BATCH_SIZE,crnn_sess,crnn_graph)
+    all_txt,_ = crnn.pred(small_images, conf.CRNN_BATCH_SIZE, crnn_sess, crnn_graph)
     logger.debug("最终的预测结果为：%r",all_txt)
     return all_txt
 

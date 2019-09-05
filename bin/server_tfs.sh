@@ -15,7 +15,7 @@ fi
 
 if [ "$1" = "debug" ]; then
     echo "OCR Web 服务调试模式"
-    gunicorn --workers=1 --bind=0.0.0.0:8080 --timeout=300 server:app
+    gunicorn --workers=1 --bind=0.0.0.0:8080 --timeout=300 server.server_tfs:app
     exit
 fi
 
@@ -86,7 +86,7 @@ _CMD="CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
     --worker-connections=$CONNECTION \
     --bind=0.0.0.0:$PORT \
     --timeout=300 \
-    server.server:app \
+    server.server_tfs:app \
     \>> ./logs/ocr_server_$Date.log 2>&1 &"
 echo "启动服务："
 echo "$_CMD"
