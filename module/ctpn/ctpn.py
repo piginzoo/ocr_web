@@ -6,6 +6,7 @@ import logging
 
 import numpy as np
 import tensorflow as tf
+import time
 
 import module.tfs.channels as channel
 from module.ctpn import ctpn_handle
@@ -18,7 +19,7 @@ logger = logging.getLogger("ctpn")
 
 # ctpn predict
 def ctpn_predict(original_img, image_name):
-
+    start_time = time.time()
     image, scale = image_utils.resize_image(original_img, 1200, 1600)
 
     logger.info("image.shape:%s", image.shape)
@@ -81,4 +82,5 @@ def ctpn_predict(original_img, image_name):
     logger.debug("ctpn end handle cls_prob,bbox_pred, by result:%s", draw_image)
     result = []
     result.append(_image)
+    logger.info("ctpn总共用时：%s", (time.time() - start_time))
     return result

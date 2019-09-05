@@ -21,7 +21,7 @@ FLAGS = tf.app.flags.FLAGS
 
 logging.basicConfig(
     format='%(asctime)s : %(levelname)s : %(message)s',
-    level=logging.DEBUG,
+    level=logging.INFO,
     handlers=[logging.StreamHandler()])
 
 logger = logging.getLogger("WebServer")
@@ -174,7 +174,7 @@ def ocr():
     logger.debug("获得上传图片[%s]，尺寸：%d 字节", image_name, len(image))
     start = time.time()
     result = pridict(image, image_name, is_verbose=True)
-    logger.debug("识别图片[%s]花费[%d]秒", image_name, time.time() - start)
+    logger.info("识别图片[%s]花费[%d]秒", image_name, time.time() - start)
     return render_template('result.html', result=result)
 
 

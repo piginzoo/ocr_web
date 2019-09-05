@@ -6,7 +6,7 @@ import logging
 import os
 import numpy as np
 import tensorflow as tf
-
+import time
 import module.crnn.utils.image_util as image_util
 import module.tfs.channels as channel
 from module.crnn.config import config
@@ -19,6 +19,7 @@ charset = data_utils.get_charset(os.path.join(os.path.abspath(''),"module/crnn/c
 
 # crnn predict
 def crnn_predict(image_list, _batch_size):
+    start_time = time.time()
     pred_result = []  # 预测结果，每个元素是一个字符串
     for i in range(0, len(image_list), _batch_size):
         # 计算实际的batch大小，最后一批数量可能会少一些
@@ -60,4 +61,5 @@ def crnn_predict(image_list, _batch_size):
         preds = data_utils.sparse_tensor_to_str_new(preds_sparse, charset)
         pred_result += preds
     logger.debug("pred_result:%s", pred_result)
+    logger.info("crnn总共用时：%s", (time.time() - start_time))
     return pred_result
