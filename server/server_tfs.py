@@ -33,7 +33,7 @@ app = Flask(__name__, root_path="web")
 app.jinja_env.globals.update(zip=zip)
 
 
-def pridict(original_img, image_name, is_verbose=False):
+def pridict(original_img, image_name="test.jpg", is_verbose=False):
     """
     预测图片
     :param original_img: image
@@ -63,7 +63,7 @@ def pridict(original_img, image_name, is_verbose=False):
                 logger.debug("返回大图为空")
         # logger.debug("最终的预测的子图:%r",result[0]['small_images'])
 
-    return result[0]
+    return True, result[0]
 
 
 def decode2img(buffer):
@@ -144,7 +144,7 @@ def ocr_base64():
         else:
             success, result = pridict(image)
 
-        if result:
+        if success:
             result = api.post_process(result, width, height)
     except Exception as e:
         import traceback
@@ -174,7 +174,7 @@ def ocr():
 
     logger.info("获得上传图片[%s]，尺寸：%d 字节", image_name, len(image))
     start = time.time()
-    result = pridict(image, image_name, is_verbose=True)
+    success, result = pridict(image, image_name, is_verbose=True)
     logger.info("识别图片[%s]花费[%d]秒", image_name, time.time() - start)
     return render_template('result.html', result=result)
 

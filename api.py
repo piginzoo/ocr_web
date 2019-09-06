@@ -1,14 +1,14 @@
-import json,base64
+import json, base64
 import logging
 from json.decoder import JSONDecodeError
 import datetime
-logger = logging.getLogger("API")
 
+logger = logging.getLogger("API")
 
 
 def json2dict(request):
     str_data = request.get_data()
-    logger.debug("Got CRNN data:%d bytes",len(str_data))
+    logger.debug("Got CRNN data:%d bytes", len(str_data))
     data = str_data.decode('utf-8')
     try:
         data = data.replace('\r\n', '')
@@ -17,8 +17,9 @@ def json2dict(request):
     except JSONDecodeError as e:
         logger.error(data)
         logger.error("JSon数据格式错误")
-        raise  Exception("JSon数据格式错误:"+str(e))
+        raise Exception("JSon数据格式错误:" + str(e))
     return data
+
 
 '''
 请求的报文：
@@ -33,22 +34,24 @@ def json2dict(request):
 
 处理调用的参数，还原图片
 '''
-def process_request(request):
 
+
+def process_request(request):
     data = json2dict(request)
 
     base64_data = data['img']
-    logger.debug("Got image ,size:%d",len(base64_data))
+    logger.debug("Got image ,size:%d", len(base64_data))
     # 去掉可能传过来的“data:image/jpeg;base64,”HTML tag头部信息
 
     index = base64_data.find(",")
-    if index!=-1: base64_data = base64_data[index+1:]
+    if index != -1: base64_data = base64_data[index + 1:]
     # print(base64_data)
     # 降base64转化成byte数组
     buffer = base64.b64decode(base64_data)
-    logger.debug("Convert image to bytes by base64, lenght:%d",len(buffer))
+    logger.debug("Convert image to bytes by base64, lenght:%d", len(buffer))
 
     return buffer
+
 
 def process_crnn_request(request):
     data = json2dict(request)
@@ -57,7 +60,7 @@ def process_crnn_request(request):
     for d in data:
         base64_data = d['img']
         index = base64_data.find(",")
-        if index!=-1: base64_data = base64_data[index+1:]
+        if index != -1: base64_data = base64_data[index + 1:]
         # print(base64_data)
         # 降base64转化成byte数组
         buffer = base64.b64decode(base64_data)
@@ -65,9 +68,10 @@ def process_crnn_request(request):
 
     return image_data
 
+
 def post_crnn_process(result):
     prism_wordsInfo = []
-    for i,b in enumerate(result):
+    for i, b in enumerate(result):
         one = {}
         one['word'] = b
         prism_wordsInfo.append(one)
@@ -76,13 +80,12 @@ def post_crnn_process(result):
     sid = datetime.datetime.now().strftime("%Y%m%d%H%S%f")[:-3]
 
     result = \
-    {
-        "sid": sid,
-        "prism_wordsInfo": prism_wordsInfo,
-    }
-    logger.debug("图片最终识别结果：%r",result)
+        {
+            "sid": sid,
+            "prism_wordsInfo": prism_wordsInfo,
+        }
+    logger.debug("图片最终识别结果：%r", result)
     return result
-
 
 
 '''
@@ -116,47 +119,50 @@ def post_crnn_process(result):
     "content":"仅供审核使用 核实图片 2峂 201311300746 3 ...."
 }
 '''
-def post_process(result,width,height):
+
+
+def post_process(result, width, height):
     prism_wordsInfo = []
     text = ""
-    for i,b in enumerate(result['boxes']):
+    for i, b in enumerate(result['boxes']):
         one = {}
         one['pos'] = covert2xy(b.tolist())
         one['word'] = result['text'][i]
         prism_wordsInfo.append(one)
 
-        text+= result['text'][i] + " "
+        text += result['text'][i] + " "
 
     # 返回日期到毫秒级作为当前的请求的id
     sid = datetime.datetime.now().strftime("%Y%m%d%H%S%f")[:-3]
 
     result = \
-    {
-        "sid": sid,
-        "prism_version": "1.0",
-        "prism_wnum": len(result),
-        "prism_wordsInfo": prism_wordsInfo,
-        "height": height,
-        "width": width,
-        "orgHeight": height,
-        "orgWidth": width,
-        "content": text
-    }
-    logger.debug("图片最终识别结果：%r",result)
+        {
+            "sid": sid,
+            "prism_version": "1.0",
+            "prism_wnum": len(result),
+            "prism_wordsInfo": prism_wordsInfo,
+            "height": height,
+            "width": width,
+            "orgHeight": height,
+            "orgWidth": width,
+            "content": text
+        }
+    logger.debug("图片最终识别结果：%r", result)
     return result
+
 
 def covert2xy(xy_list):
     return \
         [{
-            "x":xy_list[0],
+            "x": xy_list[0],
             "y": xy_list[1],
-        },{
-            "x":xy_list[2],
+        }, {
+            "x": xy_list[2],
             "y": xy_list[3],
-        },{
-            "x":xy_list[4],
+        }, {
+            "x": xy_list[4],
             "y": xy_list[5],
-        },{
-            "x":xy_list[6],
+        }, {
+            "x": xy_list[6],
             "y": xy_list[7],
         }]
