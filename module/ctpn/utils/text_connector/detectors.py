@@ -47,7 +47,7 @@ class TextDetector:
         logger.debug("探测出来的备选框：%d", len(text_recs))
 
         keep_inds = self.filter_boxes(text_recs)
-        logger.info("需要保留(宽/高比>0.5,置信度>0.9,宽>32)下来的框%d个", len(keep_inds))
+        logger.info("需要保留(宽/高比>0.5,置信度>0.9,宽>32)下来的框%d个,shape:%s", len(keep_inds), keep_inds.shape)
         return text_recs[keep_inds]
 
     #     0  1  2  3  4  5  6  7

@@ -15,13 +15,13 @@ fi
 
 if [ "$1" = "debug" ]; then
     echo "OCR Web 服务调试模式"
-    gunicorn --workers=1 --name=ocr_web_server --bind=0.0.0.0:8080 --timeout=300 server:app
+    gunicorn --workers=1 --bind=0.0.0.0:8080 --timeout=300 server.server_tfs:app
     exit
 fi
 
 if [ "$1" = "stop" ]; then
     echo "停止 OCR Web 服务"
-    ps aux|grep ocr_web_server|grep -v grep|awk '{print $2}'|xargs kill -9
+    ps aux|grep server.server_tfs|grep -v grep|awk '{print $2}'|xargs kill -9
     exit
 fi
 
@@ -81,13 +81,12 @@ echo "服务器启动... 端口:$PORT 工作进程:$CONNECTION"
 # 参考：https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7
 # worker=4是根据GPU的显存数调整出来的，ration=0.2，大概一个进程占满为2.5G,4x2.5=10G显存
 _CMD="CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
-    --name=ocr_web_server \
     --workers=$WORKER \
     --worker-class=gevent \
     --worker-connections=$CONNECTION \
     --bind=0.0.0.0:$PORT \
     --timeout=300 \
-    server.server:app \
+    server.server_tfs:app \
     \>> ./logs/ocr_server_$Date.log 2>&1 &"
 echo "启动服务："
 echo "$_CMD"
