@@ -46,6 +46,7 @@ def disable_debug_flags():
 def init_arguments():
 
     # 共享的
+    tf.app.flags.DEFINE_string('name','ocr_web_server', '')      # 是否调试
     tf.app.flags.DEFINE_boolean('debug',DEBUG, '')      # 是否调试
 
     # 这个是为了兼容
