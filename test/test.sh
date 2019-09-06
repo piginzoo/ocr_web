@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 PORT=8081
 CON=1
 NUM=1
@@ -50,7 +49,7 @@ do
         esac
 done
 
-image="$(cat ./test/test.png | base64)"
+image="$(cat test.png | base64)"
 
 data=$(cat<<CURL_DATA
 {
@@ -68,8 +67,8 @@ if [ "$1" == "stress" ];
 then
     echo "压力测试..."
     echo $data > test.data
-    echo "ab -s 300 -c $CON -n $NUM -p test.data -T 'application/json'  http://ai3.creditease.corp/ocr"
-    ab -s 300 -c $CON -n $NUM -p test.data -T 'application/json'  http://ai3.creditease.corp/ocr
+    echo "ab -s 300 -c $CON -n $NUM -p test.data -T 'application/json'  http://127.0.0.1:$PORT/ocr"
+    ab -s 300 -c $CON -n $NUM -p test.data -T 'application/json'  http://127.0.0.1:$PORT/ocr
     echo "压力测试完毕！"
     rm test.data
     exit;
@@ -77,4 +76,4 @@ fi
 
 # 简单的测试
 echo "测试功能"
-echo $data|curl -v -d @- -H "Content-type: application/json" http://ai3.creditease.corp/ocr
+echo $data|curl -v -d @- -H "Content-type: application/json" http://127.0.0.1:$PORT/ocr
