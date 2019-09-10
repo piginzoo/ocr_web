@@ -20,7 +20,12 @@ class __Channels:
         gRPC = config.get("gRPC")
         IP = gRPC.get("IP")
         PORT = gRPC.get("PORT")
-        def newChannel(name):
+
+        ctpn = gRPC.get("ctpn")
+        crnn = gRPC.get("crnn")
+
+        def newChannel(name, IP, PORT):
+            logger.info("TFS通道连接 - name:%s IP:%s PORT:%s", name, IP, PORT)
             channel = implementations.insecure_channel(IP, PORT)
             stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
             # 预测请求
@@ -29,12 +34,12 @@ class __Channels:
             request.model_spec.signature_name = "serving_default"
             return stub, request
 
-        predStub, predRequest = newChannel("crnn")
+        predStub, predRequest = newChannel("crnn", crnn.get("IP"), crnn.get("PORT"))
         self.crnn = {
             "stub": predStub,
             "request": predRequest
         }
-        predStub, predRequest = newChannel("ctpn")
+        predStub, predRequest = newChannel("ctpn", ctpn.get("IP"), ctpn.get("PORT"))
         self.ctpn = {
             "stub": predStub,
             "request": predRequest
