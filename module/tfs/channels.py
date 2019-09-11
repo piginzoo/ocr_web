@@ -34,12 +34,12 @@ class __Channels:
             request.model_spec.signature_name = "serving_default"
             return stub, request
 
-        predStub, predRequest = newChannel("crnn", crnn.get("IP"), crnn.get("PORT"))
+        predStub, predRequest = newChannel("crnn", gRPC.get("IP"), gRPC.get("PORT"))
         self.crnn = {
             "stub": predStub,
             "request": predRequest
         }
-        predStub, predRequest = newChannel("ctpn", ctpn.get("IP"), ctpn.get("PORT"))
+        predStub, predRequest = newChannel("ctpn", gRPC.get("IP"), gRPC.get("PORT"))
         self.ctpn = {
             "stub": predStub,
             "request": predRequest
