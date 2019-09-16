@@ -2,7 +2,7 @@
 Date=$(date +%Y%m%d%H%M)
 
 function help(){
-    echo "命令格式："
+    echo " 启动基于tf-serving的OCR Web服务："
     echo "  server.sh start --port|-p [默认8080] --worker|-w [默认9] --gpu [0|1]"
     echo "  server.sh stop"
     exit
@@ -14,13 +14,13 @@ if [ -z "$*" ]; then
 fi
 
 if [ "$1" = "debug" ]; then
-    echo "OCR Web 服务调试模式"
+    echo "基于Tf-serving的OCR Web服务  ：  调试模式"
     gunicorn --workers=1 --bind=0.0.0.0:8080 --timeout=300 server.server_tfs:app
     exit
 fi
 
 if [ "$1" = "stop" ]; then
-    echo "停止 OCR Web 服务"
+    echo "停止 基于Tf-serving的OCR Web服务"
     ps aux|grep server.server_tfs|grep -v grep|awk '{print $2}'|xargs kill -9
     exit
 fi
@@ -77,7 +77,7 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-echo "服务器启动... 端口:$PORT 工作进程:$CONNECTION"
+echo "基于Tf-serving的OCR Web服务器启动... 端口:$PORT 工作进程:$CONNECTION"
 # 参考：https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7
 # worker=4是根据GPU的显存数调整出来的，ration=0.2，大概一个进程占满为2.5G,4x2.5=10G显存
 _CMD="CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
@@ -88,7 +88,7 @@ _CMD="CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
     --timeout=300 \
     server.server_tfs:app \
     \>> ./logs/ocr_server_$Date.log 2>&1 &"
-echo "启动服务："
+echo "启动服务命令："
 echo "$_CMD"
 eval $_CMD
 
