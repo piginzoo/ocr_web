@@ -2,7 +2,7 @@
 
 echo "启动Nvidia-Docker...."
 
-BASE_DIR=$(cd `dirname $0`; pwd)
+BASE_DIR=$(pwd)
 CRNN_MODEL=$BASE_DIR/model/crnn
 CTPN_MODEL=$BASE_DIR/model/ctpn
 CONFIG=$BASE_DIR/config/model.cfg
