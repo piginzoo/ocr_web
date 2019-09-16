@@ -12,7 +12,6 @@ from flask import Flask, jsonify, request, abort, render_template, Response
 
 import api
 import ocr_utils
-from config import param_config
 from module.crnn import crnn
 from module.ctpn import ctpn
 
