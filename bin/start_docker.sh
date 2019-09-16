@@ -16,8 +16,8 @@ docker run \
  -t --rm  \
  -p 8501:8501 \
  -p 8500:8500 \
- --mount type=bind,source=$CRNN,target=/model/crnn \
- --mount type=bind,source=$CTPN,target=/model/ctpn \
+ --mount type=bind,source=$CRNN_MODEL,target=/model/crnn \
+ --mount type=bind,source=$CTPN_MODEL,target=/model/ctpn \
  --mount type=bind,source=$CONFIG,target=/model/model.cfg \
  tensorflow/serving:1.14.0-gpu \
  --model_config_file=/model/model.cfg
