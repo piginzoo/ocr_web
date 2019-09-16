@@ -59,6 +59,18 @@ def caculate_accuracy(preds, labels):
 '''
 
 
+def numpy_idx_to_str(values, characters) -> List[str]:
+    # values = np.array([characters[id] for id in values])
+    values = np.array([[characters[idx] for idx in data] for data in values])
+
+    res = []
+
+    # 遍历这个dense的  number_list的每一行，变成一个字符数组
+    for one_row in number_lists:
+        res.append(''.join(c for c in one_row if c != '\n'))
+
+    return res
+
 
 def sparse_tensor_to_str_new(sparse_tensor: tf.SparseTensor, characters) -> List[str]:
     """
@@ -86,6 +98,7 @@ def sparse_tensor_to_str_new(sparse_tensor: tf.SparseTensor, characters) -> List
 
     return res
 
+
 def sparse_tensor_to_str(sparse_tensor: tf.SparseTensor, characters) -> List[str]:
     """
     :param sparse_tensor: prediction or ground truth label
@@ -110,6 +123,7 @@ def sparse_tensor_to_str(sparse_tensor: tf.SparseTensor, characters) -> List[str
         res.append(''.join(c for c in one_row if c != '\n'))
 
     return res
+
 
 def id2str(results, characters):
     values = []
@@ -351,15 +365,6 @@ def padding(image):
 
 rex = re.compile(' ')
 logger = logging.getLogger("TextUitil")
-
-
-# 加载字符集，charset.txt，最后一个是空格
-def get_charset(charset_file):
-    charset = open(charset_file, 'r', encoding='utf-8').readlines()
-    charset = [ch.strip("\n") for ch in charset]
-    charset = "".join(charset)
-    charset = list(charset)
-    return charset
 
 
 def stat(data):
