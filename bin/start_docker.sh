@@ -2,9 +2,10 @@
 
 echo "启动Nvidia-Docker...."
 
-CRNN_MODEL=./model/crnn
-CTPN_MODEL=./model/ctpn
-CONFIG=./config/model.cfg
+BASE_DIR=$(cd `dirname $0`; pwd)
+CRNN_MODEL=$BASE_DIR/model/crnn
+CTPN_MODEL=$BASE_DIR/model/ctpn
+CONFIG=$BASE_DIR/config/model.cfg
 
 echo "CTPN模型目录：$CTPN_MODEL"
 echo "CRNN模型目录：$CTPN_MODEL"
