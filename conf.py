@@ -8,6 +8,7 @@ import tensorflow as tf
 
 # 定义相关的目录，这个是为了方便3个项目集成，所以需要绝对路径，方便import，不是为了找文件，找文件用相对路径就好，是为了python import
 CTPN_HOME=['ctpn']
+CTPN_NAME="ctpn"
 
 # CTPN常用参数
 CTPN_MODEL_FILE= "ctpn-2019-05-28-22-32-39-2901.ckpt" # 定义模型目录，如果FILE被定义，直接加载FILE，否则，挑选最新的模型加载(即在checkpoint文件中记录的）
@@ -22,6 +23,7 @@ CTPN_TEST_DIR = "data/test" #
 
 # CRNN常用参数
 CRNN_HOME=['crnn']
+CRNN_NAME="crnn"
 #CRNN_MODEL_FILE= "crnn_2019-06-17-11-03-21.ckpt-325000"
 CRNN_MODEL_FILE= "LATEST"
 CRNN_MODEL_DIR="../models"
@@ -30,6 +32,10 @@ CRNN_BATCH_SIZE=128
 
 # 通用的调试开关
 DEBUG=True
+
+# Tensorflow Serving的IP和端口
+TF_SERVING_IP="127.0.0.1"
+TF_SERVING_PORT=8500
 
 # 把没必要的参数都关闭
 def disable_debug_flags():

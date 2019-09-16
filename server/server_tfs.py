@@ -33,17 +33,13 @@ app = Flask(__name__, root_path="web")
 app.jinja_env.globals.update(zip=zip)
 
 
-def pridict(original_img, image_name="test.jpg", is_verbose=False):
+def predict(original_img, image_name="test.jpg", is_verbose=False):
     """
     预测图片
     :param original_img: image
     :param image_name:  name
     :return:
     """
-    # imgPath = FLAGS.imgn
-    # (_, image_name) = os.path.split(imgPath)
-    # original_img = cv2.imread(imgPath)
-    # ctpn_predict
     result = ctpn.ctpn_predict(original_img, image_name)
     result_image = result[0]['boxes']
     small_images = ocr_utils.crop_small_images(original_img, result_image)

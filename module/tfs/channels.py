@@ -4,63 +4,25 @@
 """
 import logging
 
-import tensorflow as tf
 from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
-from tensorflow_serving.apis import prediction_service_pb2
+from tensorflow_serving.apis import prediction_service_pb2_grpc
 
-from config import config
-
-logger = logging.getLogger("channels")
-FLAGS = tf.app.flags.FLAGS
+logger = logging.getLogger(__name__)
 
 
-class __Channels:
-    def __init__(self):
-        gRPC = config.get("gRPC")
-        IP = gRPC.get("IP")
-        PORT = gRPC.get("PORT")
+def create_channel(name, IP, PORT):
+    logger.info("TF Serving 通道连接 - name:%s IP:%s PORT:%s", name, IP, PORT)
+    channel = implementations.insecure_channel(IP, PORT)
+    stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
 
-        ctpn = gRPC.get("ctpn")
-        crnn = gRPC.get("crnn")
+    # 预测请求
+    request = predict_pb2.PredictRequest()
+    request.model_spec.name = name
+    request.model_spec.signature_name = "ocr serving"
+    logger.info("链接模型[%s]的通道创建,IP:%s,端口:%d,", name, IP, PORT)
 
-        def newChannel(name, IP, PORT):
-            logger.info("TFS通道连接 - name:%s IP:%s PORT:%s", name, IP, PORT)
-            channel = implementations.insecure_channel(IP, PORT)
-            stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
-            # 预测请求
-            request = predict_pb2.PredictRequest()
-            request.model_spec.name = name
-            request.model_spec.signature_name = "serving_default"
-            return stub, request
-
-        predStub, predRequest = newChannel("crnn", gRPC.get("IP"), gRPC.get("PORT"))
-        self.crnn = {
-            "stub": predStub,
-            "request": predRequest
-        }
-        predStub, predRequest = newChannel("ctpn", gRPC.get("IP"), gRPC.get("PORT"))
-        self.ctpn = {
-            "stub": predStub,
-            "request": predRequest
-        }
-        logger.info("Channels init success")
-        pass
-
-    def getCrnnRequest(self):
-        return self.crnn
-
-    def getCtpnnRequest(self):
-        return self.ctpn
+    return stub, request
 
 
-global ctpn, crnn
 
-
-def init():
-    global ctpn, crnn
-    channels = __Channels()
-    ctpn = channels.getCtpnnRequest()
-    logger.info("ctpn init channel %s", ctpn)
-    crnn = channels.getCrnnRequest()
-    logger.info("crnn init channel %s", crnn)

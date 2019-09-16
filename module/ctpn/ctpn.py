@@ -6,7 +6,10 @@ import logging
 
 import numpy as np
 import tensorflow as tf
+from tensorflow.contrib.util import make_tensor_proto
 import time
+import conf
+
 
 import module.tfs.channels as channel
 from module.ctpn import ctpn_handle
@@ -29,11 +32,12 @@ def ctpn_predict(original_img, image_name):
     image = image[:, :, ::-1]
     # image = np.array([image])
 
-    channel.ctpn["request"].inputs["input_image"].ParseFromString(
-        tf.contrib.util.make_tensor_proto(np.array([image]), dtype=tf.float32).SerializeToString())
-    logger.info("ctpn send predict request begin")
-    response = channel.ctpn["stub"].Predict(channel.ctpn["request"], 60.0)
-    logger.info("ctpn send predict request end")
+    stub, request = channel.create_channel(conf.CTPN_NAME, conf.TF_SERVING_IP, conf.TF_SERVING_PORT)
+
+    request.inputs["input_image"].CopyFrom(make_tensor_proto(np.array([image])))
+    logger.debug("调用CTPN模型预测，开始")
+    response = stub.Predict(request, 60.0)
+    logger.debug("调用CTPN模型预测，结束")
 
     results = {}
     for key in response.outputs:
@@ -79,8 +83,8 @@ def ctpn_predict(original_img, image_name):
         logger.info("draw_image is not None")
         _image['image'] = draw_image
         _image['f1'] = f1
-    logger.debug("ctpn end handle cls_prob,bbox_pred, by result:%s", draw_image)
+    logger.debug("CTPN end handle cls_prob,bbox_pred, by result:%s", draw_image)
     result = []
     result.append(_image)
-    logger.info("ctpn总共用时：%s", (time.time() - start_time))
+    logger.info("CTPN总共用时：%s", (time.time() - start_time))
     return result
