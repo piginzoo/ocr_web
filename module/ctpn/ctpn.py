@@ -35,7 +35,7 @@ def ctpn_predict(original_img, image_name):
     stub, request = channel.create_channel(conf.CTPN_NAME, conf.TF_SERVING_IP, conf.TF_SERVING_PORT)
 
     request.inputs["input_image"].CopyFrom(make_tensor_proto(np.array([image])))
-    request.inputs["input_image"].CopyFrom(make_tensor_proto(np.array([im_info])))
+    request.inputs["input_im_info"].CopyFrom(make_tensor_proto(np.array([im_info])))
     logger.debug("调用CTPN模型预测，开始")
     response = stub.Predict(request, 60.0)
     logger.debug("调用CTPN模型预测，结束")
