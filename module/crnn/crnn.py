@@ -54,6 +54,7 @@ def crnn_predict(image_list, _batch_size):
 
         results = {}
         for key in response.outputs:
+            logger.debug("CRNN模型返回参数：%r",key)
             tensor_proto = response.outputs[key]
             results[key] = tf.contrib.util.make_ndarray(tensor_proto)
 

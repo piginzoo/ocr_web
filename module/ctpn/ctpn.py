@@ -80,7 +80,6 @@ def ctpn_predict(original_img, image_name):
         logger.info("draw_image is not None")
         _image['image'] = draw_image
         _image['f1'] = f1
-    logger.debug("CTPN end handle cls_prob,bbox_pred, by result:%s", draw_image)
     result = []
     result.append(_image)
     logger.info("CTPN总共用时：%s", (time.time() - start_time))

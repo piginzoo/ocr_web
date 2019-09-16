@@ -13,7 +13,7 @@ def crop_small_images(img, polygens):
     cropped_images = []
     for pts in polygens:
         # crop_img = img[y:y+h, x:x+w]
-        logger.debug("子图坐标：%r", pts)
+        # logger.debug("子图坐标：%r", pts)
         crop_img = img[int(pts[3]):int(pts[5]), int(pts[0]):int(pts[2])]
         cropped_images.append(crop_img)
     return cropped_images
