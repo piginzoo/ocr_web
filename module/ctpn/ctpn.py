@@ -49,9 +49,7 @@ def ctpn_predict(original_img, image_name):
     bbox_pred = results["output_bbox_pred"]
 
     logger.debug("send predict request ===>>> results > cls_prob:%s", cls_prob)
-    # logger.debug("send predict request ===>>> results > bbox_pred:%s , shape:%s", bbox_pred, bbox_pred.shape)
     logger.debug("send predict request ===>>> results > bbox_pred:%s , shape:%s", bbox_pred[0][0][0], bbox_pred.shape)
-
     logger.info("ctpn start handel cls_prob,bbox_pred")
     stat = ctpn_handle.cls_prob_val_reshape_debug_stat(cls_prob)
     logger.debug("前景返回概率情况:%s", stat)
@@ -76,8 +74,6 @@ def ctpn_predict(original_img, image_name):
     bbox_small = np.array(image_utils.resize_labels(textsegs, 1 / scale))
 
     _image = {'name': image_name, 'boxes': boxes_big}
-
-    logger.debug("_image:%s", _image)
 
     draw_image, f1 = ctpn_handle.post_detect(bbox_small, boxes_big, image_name, original_img, scores)
     if draw_image is not None:

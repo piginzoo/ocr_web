@@ -34,9 +34,9 @@ def crnn_predict(image_list, _batch_size):
 
         logger.debug("从所有图像[%d]抽取批次，从%d=>%d", len(image_list), begin, end)
         _input_data = image_list[begin:end]
-        logger.debug("抽取批次结果：%s", _input_data)
+        # logger.debug("抽取批次结果：%s", _input_data)
         _input_data = image_util.resize_batch_image(_input_data, config.INPUT_SIZE, FLAGS.resize_mode)
-        logger.debug("_input_data:%s", _input_data)
+        # logger.debug("_input_data:%s", _input_data)
 
         # batch_size，也就是CTC的sequence_length数组要求的格式是：
         # 长度是batch个，数组每个元素是sequence长度，也就是64个像素 [64,64,...64]一共batch个。
@@ -56,20 +56,19 @@ def crnn_predict(image_list, _batch_size):
         for key in response.outputs:
             tensor_proto = response.outputs[key]
             results[key] = tf.contrib.util.make_ndarray(tensor_proto)
-        # output_net_out_index = results["output_net_out_index"]
-        output_shape = results["output_shape"]
-        output_indices = results["output_indices"]
-        output_values = results["output_values"]
 
+        # output_net_out_index = results["output_net_out_index"]
+        # output_shape = results["output_shape"]
+        # output_indices = results["output_indices"]
+        # output_values = results["output_values"]
         # B(output_net_out_index)
         # logger.info("output_net_out_index:%s", output_net_out_index)
         # logger.info("output_net_out_index.shape:%s", output_net_out_index.shape)
-
-        logger.info("output_indices.shape:%s", output_indices.shape)
-        logger.info("output_shape.shape:%s", output_shape.shape)
-        logger.info("output_values.shape:%s", output_values.shape)
-
-        preds_sparse = tf.SparseTensor(output_indices, output_values, output_shape)
+        # logger.debug("output_indices.shape:%s", output_indices.shape)
+        # logger.debug("output_shape.shape:%s", output_shape.shape)
+        # logger.debug("output_values.shape:%s", output_values.shape)
+        # preds_sparse = tf.SparseTensor(output_indices, output_values, output_shape)
+        preds_sparse = results["output"]
         preds = data_utils.sparse_tensor_to_str_new(preds_sparse, charset)
         pred_result += preds
     logger.debug("CRNN预测结果:%s", pred_result)

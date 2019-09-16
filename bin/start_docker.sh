@@ -15,7 +15,6 @@ docker run \
  --runtime=nvidia  \
  -e NVIDIA_VISIBLE_DEVICES=1 \
  -t --rm  \
- -p 8501:8501 \
  -p 8500:8500 \
  --mount type=bind,source=$CRNN_MODEL,target=/model/crnn \
  --mount type=bind,source=$CTPN_MODEL,target=/model/ctpn \
