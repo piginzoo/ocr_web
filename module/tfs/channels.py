@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def create_channel(name, IP, PORT):
     logger.info("TF Serving 通道连接 - name:%s IP:%s PORT:%s", name, IP, PORT)
-    channel = grpc.insecure_channel("{}:{}".foramt(IP, PORT))
+    channel = grpc.insecure_channel("{}:{}".format(IP, PORT))
     stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
 
     # 预测请求
