@@ -32,7 +32,6 @@ fi
 
 # 默认
 PORT=8081
-CONNECTION=10
 GPU=1
 WORKER=1
 
@@ -72,7 +71,7 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-echo "基于Tf-serving的OCR Web服务器启动... 端口:$PORT 工作进程:$CONNECTION"
+echo "基于Tf-serving的OCR Web服务器启动... 端口:$PORT 工作进程:$WORKER"
 # 参考：https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7
 # worker=4是根据GPU的显存数调整出来的，ration=0.2，大概一个进程占满为2.5G,4x2.5=10G显存
 _CMD="CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
