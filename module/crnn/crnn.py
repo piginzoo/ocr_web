@@ -45,7 +45,7 @@ def crnn_predict(image_list, _batch_size):
 
         stub , request = channel.create_channel(conf.CRNN_NAME,conf.TF_SERVING_IP,conf.TF_SERVING_PORT)
 
-        request.inputs["input_data"].CopyFrom(make_tensor_proto(np.array(_input_data)))
+        request.inputs["input_data"].CopyFrom(make_tensor_proto(np.array(_input_data),dtype=tf.float32))
         request.inputs["input_batch_size"].CopyFrom(make_tensor_proto(_batch_size_array))
 
         logger.debug("调用CRNN模型预测，开始")
