@@ -2,9 +2,9 @@
 """
     说明：
 """
-import logging
-
 import grpc
+import logging
+import tensorflow as tf
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2_grpc
 
@@ -19,7 +19,7 @@ def create_channel(name, IP, PORT):
     # 预测请求
     request = predict_pb2.PredictRequest()
     request.model_spec.name = name
-    request.model_spec.signature_name = "ocr serving"
+    request.model_spec.signature_name = tf.saved_model.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY
     logger.info("链接模型[%s]的通道创建,IP:%s,端口:%d,", name, IP, PORT)
 
     return stub, request
