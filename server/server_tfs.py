@@ -7,6 +7,7 @@ from threading import current_thread
 
 import cv2
 import numpy as np
+import conf
 import tensorflow as tf
 from flask import Flask, jsonify, request, abort, render_template, Response
 
@@ -31,6 +32,7 @@ cwd = os.getcwd()
 app = Flask(__name__, root_path="web")
 app.jinja_env.globals.update(zip=zip)
 
+conf.init_arguments()
 
 def predict(original_img, image_name="test.jpg", is_verbose=False):
     """
@@ -43,7 +45,7 @@ def predict(original_img, image_name="test.jpg", is_verbose=False):
     result_image = result[0]['boxes']
     small_images = ocr_utils.crop_small_images(original_img, result_image)
     # crnn_predict
-    crnn_result = crnn.crnn_predict(small_images, param_config.CRNN_BATCH_SIZE)
+    crnn_result = crnn.crnn_predict(small_images, conf.CRNN_BATCH_SIZE)
     result[0]['text'] = crnn_result
     if is_verbose:
         # 小框们的图片的base64
@@ -94,14 +96,14 @@ def index():
 def do_crnn():
     result = None
     try:
-        param_config.disable_debug_flags()  # 不用处理调试的动作，但是对post方式，还是保留
+        conf.disable_debug_flags()  # 不用处理调试的动作，但是对post方式，还是保留
         buffers = api.process_crnn_request(request)
         images = []
         for b in buffers:
             image = decode2img(b)
             images.append(image)
         # crnn_predict
-        result = crnn.crnn_predict(images, param_config.CRNN_BATCH_SIZE)  # 小框们的文本们
+        result = crnn.crnn_predict(images, conf.CRNN_BATCH_SIZE)  # 小框们的文本们
         result = api.post_crnn_process(result)
     except Exception as e:
         import traceback
@@ -121,7 +123,7 @@ def ocr_base64():
     logger.debug("post calling...")
 
     try:
-        param_config.disable_debug_flags()  # 不用处理调试的动作，但是对post方式，还是保留
+        conf.disable_debug_flags()  # 不用处理调试的动作，但是对post方式，还是保留
         buffer = api.process_request(request)
         image = decode2img(buffer)
         height, width, _ = image.shape
@@ -137,7 +139,7 @@ def ocr_base64():
                 'text': ['xxxxxxx', 'yyyyyyy']
             }
         else:
-            success, result = pridict(image)
+            success, result = predict(image)
 
         if success:
             result = api.post_process(result, width, height)
@@ -169,7 +171,7 @@ def ocr():
 
     logger.info("获得上传图片[%s]，尺寸：%d 字节", image_name, len(image))
     start = time.time()
-    success, result = pridict(image, image_name, is_verbose=True)
+    success, result = predict(image, image_name, is_verbose=True)
     logger.info("识别图片[%s]花费[%d]秒", image_name, time.time() - start)
     return render_template('result.html', result=result)
 
