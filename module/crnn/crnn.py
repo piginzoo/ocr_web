@@ -55,13 +55,14 @@ def crnn_predict_test(image_list, _batch_size):
         for key in response.outputs:
             tensor_proto = response.outputs[key]
             results[key] = tf.contrib.util.make_ndarray(tensor_proto)
-        output_net_out_index = results["output_net_out_index"]
+        # output_net_out_index = results["output_net_out_index"]
 
         # logger.debug("output_net_out_index:%s", output_net_out_index)
         output_shape = results["output_shape"]
         output_indices = results["output_indices"]
         output_values = results["output_values"]
-        logger.info("output_net_out_index.shape:%s", output_net_out_index.shape)
+
+        # logger.info("output_net_out_index.shape:%s", output_net_out_index.shape)
         logger.info("output_indices.shape:%s", output_indices.shape)
         logger.info("output_shape.shape:%s", output_shape.shape)
         logger.info("output_values.shape:%s", output_values.shape)
@@ -108,13 +109,15 @@ def crnn_predict(image_list, _batch_size):
         for key in response.outputs:
             tensor_proto = response.outputs[key]
             results[key] = tf.contrib.util.make_ndarray(tensor_proto)
-        output_net_out_index = results["output_net_out_index"]
+        # output_net_out_index = results["output_net_out_index"]
         output_shape = results["output_shape"]
         output_indices = results["output_indices"]
         output_values = results["output_values"]
-        B(output_net_out_index)
-        logger.info("output_net_out_index:%s", output_net_out_index)
-        logger.info("output_net_out_index.shape:%s", output_net_out_index.shape)
+
+        # B(output_net_out_index)
+        # logger.info("output_net_out_index:%s", output_net_out_index)
+        # logger.info("output_net_out_index.shape:%s", output_net_out_index.shape)
+
         logger.info("output_indices.shape:%s", output_indices.shape)
         logger.info("output_shape.shape:%s", output_shape.shape)
         logger.info("output_values.shape:%s", output_values.shape)
