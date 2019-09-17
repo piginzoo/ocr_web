@@ -99,14 +99,14 @@ def numpy_idx_to_str(values, characters) -> List[str]:
 #     return res
 
 
-def sparse_tensor_to_str(sparse_tensor: tf.SparseTensor, characters) -> List[str]:
+def sparse_tensor_to_str(indices,values,dense_shape,characters) -> List[str]:
     """
     :param sparse_tensor: prediction or ground truth label
     :return: String value of the sparse tensor
     """
-    indices = sparse_tensor.indices
-    values = sparse_tensor.values  # <------------------------ 这个里面存的是string的id，所以要查找字符表，找到对应字符
-    dense_shape = sparse_tensor.dense_shape
+    # indices = sparse_tensor.indices
+    # values = sparse_tensor.values  # <------------------------ 这个里面存的是string的id，所以要查找字符表，找到对应字符
+    # dense_shape = sparse_tensor.dense_shape
     values = np.array([characters[id] for id in values])
 
     # 先初始化一个2维矩阵，用['\n']来填充，因为这个字符不会出现在结果里面，可以当做特殊字符来处理
