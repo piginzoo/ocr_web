@@ -25,16 +25,18 @@ if [ "$1" == "start" ];then
     echo "Config配置： $CONFIG"
 
     # "--runtime=nvidia":启动nvidia-docker，是一种特殊的docker，支持GPU资源管理
-#    CMD="docker run \
-#     --runtime=nvidia  \
-#     -e NVIDIA_VISIBLE_DEVICES=1 \
-#     -t --rm  \
-#     -p 8500:8500 \
-#     --mount type=bind,source=$CRNN_MODEL,target=/model/crnn \
-#     --mount type=bind,source=$CTPN_MODEL,target=/model/ctpn \
-#     --mount type=bind,source=$CONFIG,target=/model/model.cfg \
-#     tensorflow/serving:'$TF_VERSION'-gpu \
-#     --model_config_file=/model/model.cfg"
+    CMD="docker run \
+     --runtime=nvidia  \
+     -e NVIDIA_VISIBLE_DEVICES=1 \
+     -t --rm  \
+     -p 8500:8500 \
+     --mount type=bind,source=$CRNN_MODEL,target=/model/crnn \
+     --mount type=bind,source=$CTPN_MODEL,target=/model/ctpn \
+     --mount type=bind,source=$CONFIG,target=/model/model.cfg \
+     tensorflow/serving:'$TF_VERSION'-gpu \
+     --model_config_file=/model/model.cfg"
+
+    echo $CMD
 
     docker run \
      --runtime=nvidia  \
