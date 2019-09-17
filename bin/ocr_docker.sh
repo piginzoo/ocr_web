@@ -33,7 +33,7 @@ if [ "$1" == "start" ];then
      --mount type=bind,source=$CRNN_MODEL,target=/model/crnn \
      --mount type=bind,source=$CTPN_MODEL,target=/model/ctpn \
      --mount type=bind,source=$CONFIG,target=/model/model.cfg \
-     tensorflow/serving:'$TF_VERSION'-gpu \
+     tensorflow/serving:`$TF_VERSION`-gpu \
      --model_config_file=/model/model.cfg"
 
     echo $CMD
@@ -46,6 +46,6 @@ if [ "$1" == "start" ];then
      --mount type=bind,source=$CRNN_MODEL,target=/model/crnn \
      --mount type=bind,source=$CTPN_MODEL,target=/model/ctpn \
      --mount type=bind,source=$CONFIG,target=/model/model.cfg \
-     tensorflow/serving:'$TF_VERSION'-gpu \
+     tensorflow/serving:`$TF_VERSION`-gpu \
      --model_config_file=/model/model.cfg
 fi
