@@ -15,14 +15,20 @@ if [ "$1" == "start" ];then
     echo "启动Nvidia-Docker...."
 
     TF_VERSION=1.12.3
+    if [ "$2" != "" ];then
+        TF_VERSION=$2
+        echo "自定义容器  ：$2"
+    fi
     BASE_DIR=$(pwd)
     CRNN_MODEL=$BASE_DIR/model/crnn
     CTPN_MODEL=$BASE_DIR/model/ctpn
     CONFIG=$BASE_DIR/config/model.cfg
 
+    echo "Docker镜像  ：tensorflow/serving:$TF_VERSION-gpu"
     echo "CTPN模型目录：$CTPN_MODEL"
     echo "CRNN模型目录：$CTPN_MODEL"
-    echo "Config配置： $CONFIG"
+    echo "Config配置  ：$CONFIG"
+
 
     # "--runtime=nvidia":启动nvidia-docker，是一种特殊的docker，支持GPU资源管理
     docker run \
