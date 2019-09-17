@@ -1,4 +1,4 @@
-if [ "$1" == "stop" ];then
+if [ "$1" == "" ];then
     echo "命令：ocr_docker.sh start|stop"
     exit
 fi
@@ -14,7 +14,7 @@ fi
 if [ "$1" == "start" ];then
     echo "启动Nvidia-Docker...."
 
-    TF-VERSION=1.12.3
+    TF_VERSION=1.12.3
     BASE_DIR=$(pwd)
     CRNN_MODEL=$BASE_DIR/model/crnn
     CTPN_MODEL=$BASE_DIR/model/ctpn
@@ -25,6 +25,17 @@ if [ "$1" == "start" ];then
     echo "Config配置： $CONFIG"
 
     # "--runtime=nvidia":启动nvidia-docker，是一种特殊的docker，支持GPU资源管理
+#    CMD="docker run \
+#     --runtime=nvidia  \
+#     -e NVIDIA_VISIBLE_DEVICES=1 \
+#     -t --rm  \
+#     -p 8500:8500 \
+#     --mount type=bind,source=$CRNN_MODEL,target=/model/crnn \
+#     --mount type=bind,source=$CTPN_MODEL,target=/model/ctpn \
+#     --mount type=bind,source=$CONFIG,target=/model/model.cfg \
+#     tensorflow/serving:'$TF_VERSION'-gpu \
+#     --model_config_file=/model/model.cfg"
+
     docker run \
      --runtime=nvidia  \
      -e NVIDIA_VISIBLE_DEVICES=1 \
@@ -33,6 +44,6 @@ if [ "$1" == "start" ];then
      --mount type=bind,source=$CRNN_MODEL,target=/model/crnn \
      --mount type=bind,source=$CTPN_MODEL,target=/model/ctpn \
      --mount type=bind,source=$CONFIG,target=/model/model.cfg \
-     tensorflow/serving:'$TF-VERSION'-gpu \
+     tensorflow/serving:'$TF_VERSION'-gpu \
      --model_config_file=/model/model.cfg
 fi
