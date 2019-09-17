@@ -31,11 +31,11 @@ if [ ! "$1" = "start" ]; then
 fi
 
 # 默认
-PORT=8081
+PORT=8082
 GPU=1
 WORKER=1
 
-ARGS=`getopt -o p:g:w: --long port:,gpu:,worker: -n 'help.bash' -- "$@"`
+ARGS=`getopt -o p:w: --long port:,worker: -n 'help.bash' -- "$@"`
 if [ $? != 0 ]; then
     help
     exit 1
@@ -56,11 +56,6 @@ do
                     WORKER=$2
                     shift 2
                     ;;
-                -g|--gpu)
-                    echo "自定义#GPU：  #$2"
-                    GPU=$2
-                    shift 2
-                    ;;
                 --) shift ; break ;;
                 *) help; exit 1 ;;
         esac
@@ -74,7 +69,7 @@ fi
 echo "基于Tf-serving的OCR Web服务器启动... 端口:$PORT 工作进程:$WORKER"
 # 参考：https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7
 # worker=4是根据GPU的显存数调整出来的，ration=0.2，大概一个进程占满为2.5G,4x2.5=10G显存
-_CMD="CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
+_CMD="nohup gunicorn \
     --workers=$WORKER \
     --bind=0.0.0.0:$PORT \
     --timeout=300 \
