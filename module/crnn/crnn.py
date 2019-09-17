@@ -76,7 +76,7 @@ def crnn_predict(image_list, _batch_size):
         # B.尝试单个SparseTensor的解决办法
         # preds_sparse = results["output"]
 
-        preds = data_utils.sparse_tensor_to_str_new(preds_sparse, charset)
+        preds = data_utils.sparse_tensor_to_str(preds_sparse, charset)
         pred_result += preds
     logger.debug("CRNN预测结果:%s", pred_result)
     logger.info("全部CRNN预测完成，共用时：%s", (time.time() - start_time))
