@@ -59,9 +59,6 @@ def crnn_predict(image_list, _batch_size):
             results[key] = tf.contrib.util.make_ndarray(tensor_proto)
 
         # output_net_out_index = results["output_net_out_index"]
-        # output_shape = results["output_shape"]
-        # output_indices = results["output_indices"]
-        # output_values = results["output_values"]
         # B(output_net_out_index)
         # logger.info("output_net_out_index:%s", output_net_out_index)
         # logger.info("output_net_out_index.shape:%s", output_net_out_index.shape)
@@ -69,7 +66,16 @@ def crnn_predict(image_list, _batch_size):
         # logger.debug("output_shape.shape:%s", output_shape.shape)
         # logger.debug("output_values.shape:%s", output_values.shape)
         # preds_sparse = tf.SparseTensor(output_indices, output_values, output_shape)
-        preds_sparse = results["output"]
+
+        # A.解决单个SparseTensor无法被识别的问题，红岩之前的解决方案
+        output_shape = results["output_shape"]
+        output_indices = results["output_indices"]
+        output_values = results["output_values"]
+        preds_sparse = tf.SparseTensor(output_indices, output_values, output_shape)
+
+        # B.尝试单个SparseTensor的解决办法
+        # preds_sparse = results["output"]
+
         preds = data_utils.sparse_tensor_to_str_new(preds_sparse, charset)
         pred_result += preds
     logger.debug("CRNN预测结果:%s", pred_result)

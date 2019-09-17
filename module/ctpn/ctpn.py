@@ -48,8 +48,8 @@ def ctpn_predict(original_img, image_name):
     cls_prob = results["output_cls_prob"]
     bbox_pred = results["output_bbox_pred"]
 
-    logger.debug("send predict request ===>>> results > cls_prob:%s", cls_prob)
-    logger.debug("send predict request ===>>> results > bbox_pred:%s , shape:%s", bbox_pred[0][0][0], bbox_pred.shape)
+    # logger.debug("send predict request ===>>> results > cls_prob:%s", cls_prob)
+    # logger.debug("send predict request ===>>> results > bbox_pred:%s , shape:%s", bbox_pred[0][0][0], bbox_pred.shape)
     logger.info("ctpn start handel cls_prob,bbox_pred")
     stat = ctpn_handle.cls_prob_val_reshape_debug_stat(cls_prob)
     logger.debug("前景返回概率情况:%s", stat)
@@ -65,8 +65,8 @@ def ctpn_predict(original_img, image_name):
     boxes = textdetector.detect(textsegs, scores[:, np.newaxis], image.shape[:2])
     # box是9个值，4个点，8个值了吧，还有个置信度：全部小框得分的均值作为文本行的均值
     boxes = np.array(boxes, dtype=np.int)
-    logger.debug("results > len:%s boxes:%s , shape:%s", len(boxes), boxes, boxes.shape)
-    logger.debug("results > len:%s boxes:%s , shape:%s", len(boxes[0]), boxes[0], boxes.shape)
+    # logger.debug("results > len:%s boxes:%s , shape:%s", len(boxes), boxes, boxes.shape)
+    # logger.debug("results > len:%s boxes:%s , shape:%s", len(boxes[0]), boxes[0], boxes.shape)
     # boxes, scores, textsegs
 
     # scale 放大 unresize back回去
