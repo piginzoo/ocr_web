@@ -68,13 +68,13 @@ def crnn_predict(image_list, _batch_size):
         # preds_sparse = tf.SparseTensor(output_indices, output_values, output_shape)
 
         # A.解决单个SparseTensor无法被识别的问题，红岩之前的解决方案
-        output_shape = results["output_shape"]
-        output_indices = results["output_indices"]
-        output_values = results["output_values"]
-        preds_sparse = tf.SparseTensor(output_indices, output_values, output_shape)
+        # output_shape = results["output_shape"]
+        # output_indices = results["output_indices"]
+        # output_values = results["output_values"]
+        # preds_sparse = tf.SparseTensor(output_indices, output_values, output_shape)
 
         # B.尝试单个SparseTensor的解决办法
-        # preds_sparse = results["output"]
+        preds_sparse = results["output"]
 
         preds = data_utils.sparse_tensor_to_str(preds_sparse, charset)
         pred_result += preds
