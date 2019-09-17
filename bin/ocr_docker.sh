@@ -14,6 +14,7 @@ fi
 if [ "$1" == "start" ];then
     echo "启动Nvidia-Docker...."
 
+    TF-VERSION=1.12.3
     BASE_DIR=$(pwd)
     CRNN_MODEL=$BASE_DIR/model/crnn
     CTPN_MODEL=$BASE_DIR/model/ctpn
@@ -32,6 +33,6 @@ if [ "$1" == "start" ];then
      --mount type=bind,source=$CRNN_MODEL,target=/model/crnn \
      --mount type=bind,source=$CTPN_MODEL,target=/model/ctpn \
      --mount type=bind,source=$CONFIG,target=/model/model.cfg \
-     tensorflow/serving:1.14.0-gpu \
+     tensorflow/serving:'$TF-VERSION'-gpu \
      --model_config_file=/model/model.cfg
 fi
