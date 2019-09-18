@@ -36,6 +36,7 @@ if [ "$1" == "start" ];then
      -e NVIDIA_VISIBLE_DEVICES=1 \
      -t --rm  \
      -p 8500:8500 \
+     --cpus=10 \
      --mount type=bind,source=$CRNN_MODEL,target=/model/crnn \
      --mount type=bind,source=$CTPN_MODEL,target=/model/ctpn \
      --mount type=bind,source=$CONFIG,target=/model/model.cfg \
