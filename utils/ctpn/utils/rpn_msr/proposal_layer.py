@@ -3,10 +3,10 @@ import numpy as np
 
 from nms import nms
 
-from module.ctpn.utils import stat
-from module.ctpn.utils.bbox.bbox_transform import bbox_transform_inv, clip_boxes
-from module.ctpn.utils.rpn_msr.config import Config as cfg
-from module.ctpn.utils.rpn_msr.generate_anchors import generate_anchors
+from utils.ctpn.utils import stat
+from utils.ctpn.utils.bbox.bbox_transform import bbox_transform_inv, clip_boxes
+from utils.ctpn.utils.rpn_msr.config import Config as cfg
+from utils.ctpn.utils.rpn_msr.generate_anchors import generate_anchors
 
 DEBUG = False
 

@@ -4,7 +4,7 @@ import os
 import cv2
 import numpy as np
 
-from module.crnn.config import config
+from utils.crnn.config import config
 
 logger = logging.getLogger("ImageUtil")
 

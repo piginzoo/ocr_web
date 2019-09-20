@@ -8,10 +8,10 @@ import os
 import cv2
 import tensorflow as tf
 
-from module.ctpn.utils import stat
-from module.ctpn.utils.dataset import data_provider as data_provider
-from module.ctpn.utils.evaluate.evaluator import *
-from module.ctpn.utils.rpn_msr.config import Config
+from utils.ctpn.utils import stat
+from utils.ctpn.utils.dataset import data_provider as data_provider
+from utils.ctpn.utils.evaluate.evaluator import *
+from utils.ctpn.utils.rpn_msr.config import Config
 
 logger = logging.getLogger("ctpn_handle")
 

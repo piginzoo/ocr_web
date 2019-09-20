@@ -1,24 +1,16 @@
 #-*- coding:utf-8 -*- 
 from flask import Flask,jsonify,request,abort,render_template,Response
 import base64,cv2, numpy as np
-import sys,logging,os
-from config import conf
+import logging
+from server import conf
 
-# 为了集成项目,把CTPN和CRNN项目的绝对路径加到python类路径里面
-for path in conf.CRNN_HOME + conf.CTPN_HOME:
-    sys.path.insert(0, os.path.join(os.path.abspath(os.pardir), path))
-import tensorflow as tf
 from threading import current_thread
-sys.path.append(".")
-import ocr_utils,time
-# 完事了，才可以import ctpn，否则报错
-import main.pred  as ctpn
-import tools.pred as crnn
-
+import time
+from utils import ocr_utils, api
+from ctpn.main import pred as ctpn
+from crnn.tools import pred as crnn
 import os
-import api
-
-DEBUG = False
+import utils.tf_serving_agent as tfserving
 
 logging.basicConfig(
     format='%(asctime)s : %(levelname)s : %(message)s',
@@ -29,16 +21,24 @@ logger = logging.getLogger("WebServer")
 
 logger.debug('子进程:%s,父进程:%s,线程:%r', os.getpid(), os.getppid(), current_thread())
 
-conf.init_arguments()
+mode = conf.init_arguments()
 
-global ctpn_sess, crnn_sess
-gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3, allow_growth=True)
-config = tf.ConfigProto(gpu_options=gpu_options)
-config.allow_soft_placement = True
-logger.debug("开始初始化CTPN")
-ctpn_sess,ctpn_graph = ctpn.initialize(config)
-logger.debug("开始初始化CRNN")
-crnn_sess,crnn_graph = crnn.initialize(config)
+ctpn_params = None
+crnn_params = None
+
+if mode=="single":
+    import tensorflow as tf
+    logger.info("启动加载模型模式")
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3, allow_growth=True)
+    config = tf.ConfigProto(gpu_options=gpu_options)
+    config.allow_soft_placement = True
+    logger.debug("开始初始化CTPN")
+    ctpn_params = ctpn.initialize(config)
+    logger.debug("开始初始化CRNN")
+    crnn_params = crnn.initialize(config)
+
+if mode=="tfserving":
+    logger.info("启动TF-Serving模式")
 
 cwd = os.getcwd()
 app = Flask(__name__,root_path="web")
@@ -80,11 +80,13 @@ def process(image,image_name="test.jpg",is_verbose=False):
     #     'f1': 0.78
     #     }
     # }, ]
-    #global  crnn_sess,ctpn_sess
-    result = ctpn.pred(ctpn_sess,[image],[image_name],ctpn_graph)
+    print(mode)
+    call_back = None if mode=="single" else tfserving.ctpn_tf_serving_call
+    print(call_back)
+    result = ctpn.pred(ctpn_params,[image],[image_name],call_back)
 
     # logger.debug("预测返回结果：%r",result[0])
-    small_images = ocr_utils.crop_small_images(image,result[0]['boxes'])
+    small_images = ocr_utils.crop_small_images(image, result[0]['boxes'])
     result[0]['text'] = process_crnn(small_images)    # 小框们的文本们
 
     # 仅仅调试CTPN
@@ -108,11 +110,10 @@ def process(image,image_name="test.jpg",is_verbose=False):
 
 
 def process_crnn(small_images):
-    all_txt,_ = crnn.pred(small_images, conf.CRNN_BATCH_SIZE, crnn_sess, crnn_graph)
+    call_back = None if mode == "single" else tfserving.crnn_tf_serving_call
+    all_txt,_ = crnn.pred(crnn_params,small_images, conf.CRNN_BATCH_SIZE,call_back)
     logger.debug("最终的预测结果为：%r",all_txt)
     return all_txt
-
-
 
 @app.route("/")
 def index():
@@ -124,9 +125,8 @@ def index():
 # base64编码的小图片的识别，这个制作OCR文字识别，不做文字弹出了
 @app.route('/crnn',methods=['POST'])
 def do_crnn():
-    result = None
     try:
-        conf.disable_debug_flags() # 不用处理调试的动作，但是对post方式，还是保留
+        if mode == "single": conf.disable_debug_flags() # 不用处理调试的动作，但是对post方式，还是保留
         buffers = api.process_crnn_request(request)
         images = []
         for b in buffers:
@@ -152,7 +152,7 @@ def ocr_base64():
     logger.debug("post calling...")
 
     try:
-        conf.disable_debug_flags() # 不用处理调试的动作，但是对post方式，还是保留
+        if mode=="single": conf.disable_debug_flags() # 不用处理调试的动作，但是对post方式，还是保留
         buffer = api.process_request(request)
 
         image = decode2img(buffer)
@@ -160,20 +160,10 @@ def ocr_base64():
         if image is None:
             return jsonify({'error_code':-1,'message':'image decode from base64 failed.'})
 
-        if DEBUG:
-            success=True
-            result= { # 测试用
-                'name': 'xxx.png',
-                'boxes': [[1, 1, 1, 1],
-                        [2, 2, 2, 2]],
-                'text':['xxxxxxx','yyyyyyy']
-            }
-        else:
-            success,result = process(image)
-        # width,height,_ = buffer.shape()
+        success,result = process(image)
 
         if result:
-            result = api.post_process(result,width,height)
+            result = api.post_process(result, width, height)
     except Exception as e:
         import traceback
         traceback.print_exc()

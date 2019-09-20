@@ -3,7 +3,7 @@ Date=$(date +%Y%m%d%H%M)
 
 function help(){
     echo "命令格式："
-    echo "  server.sh start --port|-p [默认8080] --worker|-w [默认9] --gpu [0|1]"
+    echo "  server.sh start --port|-p [默认8080] --worker|-w [默认3] --gpu [0|1] --mode|-m [tfserving|single]"
     echo "  server.sh stop"
     exit
 }
@@ -34,9 +34,10 @@ fi
 PORT=8081
 CONNECTION=10
 GPU=1
-WORKER=1
+WORKER=3
+MODE=tfserving #tf-serving方式，single是单独加载模型
 
-ARGS=`getopt -o p:c:g:w: --long port:,connection:,gpu:,worker: -n 'help.bash' -- "$@"`
+ARGS=`getopt -o p:c:g:w:m: --long port:,connection:,gpu:,worker:,mode: -n 'help.bash' -- "$@"`
 if [ $? != 0 ]; then
     help
     exit 1
@@ -67,6 +68,12 @@ do
                     GPU=$2
                     shift 2
                     ;;
+                -m|--mode)
+                    echo "自定义模式：  #$2"
+                    MODE=$2
+                    shift 2
+                    ;;
+
                 --) shift ; break ;;
                 *) help; exit 1 ;;
         esac
@@ -77,19 +84,42 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-echo "服务器启动... 端口:$PORT 工作进程:$CONNECTION"
-# 参考：https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7
-# worker=4是根据GPU的显存数调整出来的，ration=0.2，大概一个进程占满为2.5G,4x2.5=10G显存
-_CMD="CUDA_VISIBLE_DEVICES=$GPU nohup gunicorn \
-    --name=ocr_web_server \
+if [ "$MODE" == "tfserving" ]; then
+    echo "基于Tf-Serving的OCR Web服务器启动... 端口:$PORT 工作进程:$WORKER"
+    # 参考：https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7
+    # worker=4是根据GPU的显存数调整出来的，ration=0.2，大概一个进程占满为2.5G,4x2.5=10G显存
+    _CMD="gunicorn \
     --workers=$WORKER \
-    --worker-class=gevent \
-    --worker-connections=$CONNECTION \
     --bind=0.0.0.0:$PORT \
     --timeout=300 \
-    server.server:app \
-    \>> ./logs/ocr_server_$Date.log 2>&1 &"
-echo "启动服务："
-echo "$_CMD"
-eval $_CMD
+    server.server:app\
+    --env mode=$MODE"
+#    >> ./logs/ocr_server_$Date.log 2>&1 &"
+    echo "启动服务："
+    echo "$_CMD"
+    eval $_CMD
+    exit 0
+fi
 
+
+if [ "$MODE" == "single" ]; then
+    echo "非Docker服务器启动... 端口:$PORT 工作进程:$CONNECTION"
+    # 参考：https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7
+    # worker=4是根据GPU的显存数调整出来的，ration=0.2，大概一个进程占满为2.5G,4x2.5=10G显存
+    _CMD="CUDA_VISIBLE_DEVICES=$GPU gunicorn \
+        --name=ocr_web_server \
+        --workers=$WORKER \
+        --worker-class=gevent \
+        --worker-connections=$CONNECTION \
+        --bind=0.0.0.0:$PORT \
+        --timeout=300 \
+        server.server:app\
+        --env mode=$MODE"
+#        \>> ./logs/ocr_server_$Date.log 2>&1 &"
+    echo "启动服务："
+    echo "$_CMD"
+    eval $_CMD
+    exit 0
+fi
+
+echo "无法识别的服务器类型：MODE=$MODE"

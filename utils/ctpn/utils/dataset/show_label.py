@@ -6,7 +6,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from data_generator import generator
-from module.ctpn.utils.dataset.data_util import GeneratorEnqueuer
+from utils.ctpn.utils.dataset.data_util import GeneratorEnqueuer
 
 DATA_FOLDER = "data/dataset/"
 

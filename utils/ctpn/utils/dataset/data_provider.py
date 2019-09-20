@@ -4,7 +4,7 @@ import time
 import logging
 import cv2
 import numpy as np
-from module.ctpn.utils.dataset.data_util import GeneratorEnqueuer
+from utils.ctpn.utils.dataset.data_util import GeneratorEnqueuer
 
 logger = logging.getLogger("data provider")
 

@@ -1,7 +1,7 @@
 import numpy as np
 
-from module.ctpn.utils.text_connector.other import Graph
-from module.ctpn.utils.text_connector.text_connect_cfg import Config as TextLineCfg
+from utils.ctpn.utils.text_connector.other import Graph
+from utils.ctpn.utils.text_connector.text_connect_cfg import Config as TextLineCfg
 
 
 class TextProposalGraphBuilder:

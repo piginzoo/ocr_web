@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+import os,sys
 ################################################################
 #
 #   定义CTPN、CRNN的共同参数
@@ -24,8 +24,8 @@ CTPN_TEST_DIR = "data/test" #
 # CRNN常用参数
 CRNN_HOME=['crnn']
 CRNN_NAME="crnn"
-#CRNN_MODEL_FILE= "crnn_2019-06-17-11-03-21.ckpt-325000"
-CRNN_MODEL_FILE= "LATEST"
+CRNN_MODEL_FILE= "crnn_2019-06-27-05-06-48.ckpt-58000"
+# CRNN_MODEL_FILE= "LATEST"
 CRNN_MODEL_DIR="../models"
 CRNN_CHARSET_FILE="../crnn/charset.3770.txt"
 CRNN_BATCH_SIZE=128
@@ -50,6 +50,12 @@ def disable_debug_flags():
 
 # 定义各类参数
 def init_arguments():
+    mode = os.getenv("mode")
+    sys.modules[__name__].mode= mode
+
+    if mode=="tfserving":
+        return mode
+
 
     # 共享的
     tf.app.flags.DEFINE_string('name','ocr_web_server', '')      # 是否调试
@@ -60,6 +66,7 @@ def init_arguments():
     tf.app.flags.DEFINE_string('worker-class', 'gevent', '')
     tf.app.flags.DEFINE_integer('workers', 1, '')
     tf.app.flags.DEFINE_string('bind', '0.0.0.0:8080', '')
+    tf.app.flags.DEFINE_string('env', '', '')
     tf.app.flags.DEFINE_integer('timeout', 60, '')
     tf.app.flags.DEFINE_string('preload', '', '')
     tf.app.flags.DEFINE_integer('worker-connections', 1000, '')
@@ -81,3 +88,5 @@ def init_arguments():
     tf.app.flags.DEFINE_integer('batch_size', CRNN_BATCH_SIZE, '')
     tf.app.flags.DEFINE_string('charset', CRNN_CHARSET_FILE, '')    # 字符集
     tf.app.flags.DEFINE_string('resize_mode', 'PAD', '')
+
+    return "single"

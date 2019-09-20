@@ -7,14 +7,11 @@ from threading import current_thread
 
 import cv2
 import numpy as np
-import conf
+from server import conf
 import tensorflow as tf
 from flask import Flask, jsonify, request, abort, render_template, Response
 
-import api
-import ocr_utils
-from module.crnn import crnn
-from module.ctpn import ctpn
+from utils import crnn, ctpn, ocr_utils, api
 
 DEBUG = False
 FLAGS = tf.app.flags.FLAGS
