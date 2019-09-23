@@ -4,9 +4,12 @@ Shapely==1.6.4.post1
 python3-tk
 matplotlib==1.5.3
 numpy==1.14.2
-tensorflow-gpu==1.14.0
+tensorflow-serving-api-gpu==1.14.0
 easydict==1.6
 Cython==0.24.1
 ipython==5.1.0
 Pillow
-
+gevent==1.4.0
+gunicorn==19.9.0
+flask==1.1.1
+python-levenshtein==0.12.0

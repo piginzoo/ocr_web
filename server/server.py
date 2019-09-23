@@ -10,7 +10,7 @@ from utils import ocr_utils, api
 from ctpn.main import pred as ctpn
 from crnn.tools import pred as crnn
 import os
-import utils.tf_serving_agent as tfserving
+
 
 logging.basicConfig(
     format='%(asctime)s : %(levelname)s : %(message)s',
@@ -81,8 +81,11 @@ def process(image,image_name="test.jpg",is_verbose=False):
     #     }
     # }, ]
     print(mode)
-    call_back = None if mode=="single" else tfserving.ctpn_tf_serving_call
-    print(call_back)
+    call_back = None
+    if mode=="tfserving":
+        import utils.tf_serving_agent as tfserving
+        tfserving.ctpn_tf_serving_call
+
     result = ctpn.pred(ctpn_params,[image],[image_name],call_back)
 
     # logger.debug("预测返回结果：%r",result[0])
@@ -110,7 +113,11 @@ def process(image,image_name="test.jpg",is_verbose=False):
 
 
 def process_crnn(small_images):
-    call_back = None if mode == "single" else tfserving.crnn_tf_serving_call
+    call_back = None
+    if mode == "tfserving":
+        import utils.tf_serving_agent as tfserving
+        call_back = tfserving.crnn_tf_serving_call
+
     all_txt,_ = crnn.pred(crnn_params,small_images, conf.CRNN_BATCH_SIZE,call_back)
     logger.debug("最终的预测结果为：%r",all_txt)
     return all_txt
