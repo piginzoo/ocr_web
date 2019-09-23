@@ -93,8 +93,8 @@ if [ "$MODE" == "tfserving" ]; then
     --bind=0.0.0.0:$PORT \
     --timeout=300 \
     server.server:app\
-    --env mode=$MODE"
-#    >> ./logs/ocr_server_$Date.log 2>&1 &"
+    --env mode=$MODE \
+    >> ./logs/ocr_server_$Date.log 2>&1 &"
     echo "启动服务："
     echo "$_CMD"
     eval $_CMD
@@ -114,8 +114,8 @@ if [ "$MODE" == "single" ]; then
         --bind=0.0.0.0:$PORT \
         --timeout=300 \
         server.server:app\
-        --env mode=$MODE"
-#        \>> ./logs/ocr_server_$Date.log 2>&1 &"
+        --env mode=$MODE\
+        \>> ./logs/ocr_server_$Date.log 2>&1 &"
     echo "启动服务："
     echo "$_CMD"
     eval $_CMD
