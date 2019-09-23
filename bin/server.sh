@@ -115,7 +115,7 @@ if [ "$MODE" == "single" ]; then
         --timeout=300 \
         server.server:app\
         --env mode=$MODE\
-        \>> ./logs/ocr_server_$Date.log 2>&1 &"
+        >> ./logs/ocr_server_$Date.log 2>&1 &"
     echo "启动服务："
     echo "$_CMD"
     eval $_CMD
