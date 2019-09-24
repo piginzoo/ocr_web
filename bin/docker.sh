@@ -12,11 +12,23 @@ fi
 
 version=`date +%Y%m%d%H%M`
 
+if [ "$1" == "build" ] && [ "$2" == "base" ] && [ "$3" == "proxy" ];then
+    echo "构建基础容器：python3.7 以及各个基础python packages(代理Proxy模式)"
+    docker build \
+        -f config/Dockerfile.base \
+        --build-arg http_proxy=http://127.0.0.1:8123 \
+        --build-arg https_proxy=http://127.0.0.1:8123\ \
+        -t ocr.base .
+    exit
+fi
+
+
 if [ "$1" == "build" ] && [ "$2" == "base" ];then
     echo "构建基础容器：python3.7 以及各个基础python packages"
     docker build -f config/Dockerfile.base -t ocr.base .
     exit
 fi
+
 
 if [ "$1" == "build" ];then
     echo "构建容器：部署代码"
