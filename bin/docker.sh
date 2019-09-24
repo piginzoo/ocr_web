@@ -16,8 +16,8 @@ if [ "$1" == "build" ] && [ "$2" == "base" ] && [ "$3" == "proxy" ];then
     echo "构建基础容器：python3.7 以及各个基础python packages(代理Proxy模式)"
     docker build \
         -f config/Dockerfile.base \
-        --build-arg http_proxy=http://127.0.0.1:8123 \
-        --build-arg https_proxy=http://127.0.0.1:8123\ \
+        --build-arg http_proxy=http://172.17.0.1:8123 \
+        --build-arg https_proxy=http://172.17.0.1:8123\ \
         -t ocr.base .
     exit
 fi
