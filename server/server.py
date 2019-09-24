@@ -43,7 +43,7 @@ if mode=="tfserving":
 cwd = os.getcwd()
 app = Flask(__name__,root_path="web")
 app.jinja_env.globals.update(zip=zip)
-
+app.config.update(RESTFUL_JSON=dict(ensure_ascii=False))
 
 # 参考：https://www.cnblogs.com/haolujun/p/9778939.html
 # gc.freeze() #调用gc.freeze()必须在fork子进程之前，在gunicorn的这个地方调用正好合适，freeze把截止到当前的所有对象放入持久化区域，不进行回收，从而model占用的内存不会被copy-on-write。
