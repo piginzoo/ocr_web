@@ -1,4 +1,4 @@
-From registry.cn-hangzhou.aliyuncs.com/denverdino/tensorflow
+From ocr.base
 
 MAINTAINER piginzoo
 
@@ -24,7 +24,19 @@ RUN pip install -U scikit-image
 #WORKDIR /home/
 #RUN git clone from repo
 #copy latest source code to image,and current path is /app/captcha,not /app/catpcha/deploy, so use "."
-ADD . /home/captcha/
+ADD ./ctpn/ctpn  /home/ocr/ctpn/ctpn
+ADD ./ctpn/bin   /home/ocr/ctpn/bin
+ADD ./crnn/crnn  /home/ocr/crnn/crnn
+ADD ./crnn/bin   /home/ocr/crnn/bin
+ADD ./ocr/bin    /home/ocr/ocr/bin
+ADD ./ocr/server /home/ocr/ocr/server
+ADD ./ocr/utils  /home/ocr/ocr/utils
+ADD ./ocr/web    /home/ocr/ocr/web
+ADD ./ocr/requirements.txt    /home/ocr/ocr/requirements.txt
+
+# 把2个项目安装到python库中
+RUN /home/ocr/ctpn/bin/install.sh
+RUN /home/ocr/crnn/bin/install.sh
 
 EXPOSE 8080
 

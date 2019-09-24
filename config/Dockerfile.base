@@ -1,0 +1,24 @@
+From ubuntu:16.04
+
+MAINTAINER piginzoo
+
+ADD config/sources.list /etc/apt/sources.list
+RUN apt-get update
+
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get update
+
+RUN apt-get install -y python3.7 python3-pip
+
+
+ADD ./requirments.txt /home/requirments.txt
+RUN pip isntall -r /home/requirements.txt
+
+
+#RUN easy_install pip
+#RUN apt-get install -y vim
+#RUN apt-get install -y net-tools
+#RUN apt-get install -y iputils-ping
+#RUN apt-get install -y libgtk2.0-dev libsm6 libxext6 git
+#RUN apt-get install -y libevent-dev

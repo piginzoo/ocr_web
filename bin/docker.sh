@@ -10,6 +10,19 @@ if [ "$1" == "stop" ];then
     exit
 fi
 
+version=`date +%Y%m%d%H%M`
+
+if [ "$1" == "build" ] && [ "$2" == "base" ];then
+    echo "构建基础容器：python3.7 以及各个基础python packages"
+    docker build -f config/Dockerfile.base -t ocr.base .
+    exit
+fi
+
+if [ "$1" == "build" ];then
+    echo "构建容器：部署代码"
+    docker build -f config/Dockerfile.base -t ocr.$version
+    exit
+fi
 
 if [ "$1" == "start" ];then
     echo "启动Nvidia-Docker...."
